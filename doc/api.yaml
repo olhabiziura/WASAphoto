@@ -37,6 +37,9 @@ tags:
   - name: search
     description: Operations related to search
 
+security:
+  - bearerAuth: []
+
 
     
 paths:
@@ -109,12 +112,7 @@ paths:
 
           
   /photo:
-    parameters:
-      - in: path
-        name: UserID
-        schema:
-          $ref: '#/components/schemas/user_id'
-        required: true
+
 
     post:
       tags: ["photos"]
@@ -189,7 +187,7 @@ paths:
       description: Deleting a photo by its ID.
       parameters:
         - in: path
-          name: picture_id
+          name: pictureID
           required: true
           schema:
             type: integer  # Adjust schema if picture_id is not an integer
@@ -329,13 +327,6 @@ paths:
 
   
   /following:
-    parameters:
-      - in: path
-        name: UserID
-        schema:
-          $ref: '#/components/schemas/user_id'
-        required: true
-        description: The unique identifier of the user whose list of followings is to be retrieved or modified.
 
     get:
       operationId: getFollowingList
@@ -415,14 +406,6 @@ paths:
 
 
   /followers:
-    parameters:
-      - in: path
-        name: UserID
-        schema:
-          $ref: '#/components/schemas/user_id'
-        required: true
-        description: The unique identifier of the user whose list of followers is to be retrieved.
-
     get:
       operationId: getFollowersList
       tags: [followings]
@@ -688,7 +671,7 @@ components:
         likes:
           type: array
           items: 
-            $ref: '#/components/schemas/UserId'
+            $ref: '#/components/schemas/user_id'
           description: People who liked the picture
         comments:
           type: array
@@ -740,20 +723,20 @@ components:
 
 ###################RESPONSES####################
 
-responses:
-    #401
-  Unauthorized:
-      escription: The request was not authorized. The user must log in.
+  responses:
+      #401
+    Unauthorized:
+      description: The request was not authorized. The user must log in.
+  
+      #403
+    Forbidden:
+      description: The request was not authorized. The user does not have the necessary permissions.
+  
+      #500
+    InternalServerError:
+      description: An error occurred on the server. Please try again later.
 
-    #403
-  Forbidden:
-    description: The request was not authorized. The user does not have the necessary permissions.
-
-    #500
-  InternalServerError:
-    description: An error occurred on the server. Please try again later.
-
-securitySchemes:
-  bearerAuth:
-    type: http
-    scheme: bearer
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
