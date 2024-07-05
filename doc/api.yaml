@@ -1,0 +1,759 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://localhost:3000
+    
+info:
+  version: 1.0.0
+  title: WasaPhoto application project
+  description: >-
+    This document describes the API for WasaPhoto project
+    
+    'Keep in touch with your friends by sharing photos of special moments,
+    thanks to WASAPhoto! Directly from your PC,
+    you can upload your photos, and they will be visible to everyone
+    who is following you.'
+    
+  contact:
+    name: "Olha Biziura"
+    email: "olhabiziura@gmail.com"
+    
+tags:
+  - name: login
+    description: Login/Sign-Up operations
+  - name: user
+    description: User related info
+  - name: followings
+    description: Followings and followers related operations
+  - name: photos
+    description: Photo and file upload related operations
+  - name: likes
+    description: Likes related operations
+  - name: comments
+    description: Comments related operations
+  - name: bans
+    description: Information about banned users
+  - name: search
+    description: Operations related to search
+
+
+    
+paths:
+  /session:
+    post:
+      tags: [login]
+      summary: Logs in the user
+      description: |
+        If the user does not exist, it will be created,
+        and an identifier is returned.
+        If the user exists, the user identifier is returned.
+
+      operationId: doLogin
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/username'
+        required: true
+      responses:
+        "200":
+          description: |
+            User log-in action successful
+          content:
+            application/json:
+             schema:
+                $ref: '#/components/schemas/user_id'
+        "400": 
+          description: |
+            Bad request, username doesn't fit in criterias 
+          content:
+            application/json: {} 
+        "500": 
+          $ref: '#/components/responses/InternalServerError'
+
+
+
+  /username:
+    put:
+      tags: [user]
+      summary: Change User's username
+      description: >
+        Changes the existing username to a new one, provided that no other registered user already has this name.
+      operationId: setMyUserName
+      requestBody:
+        description: Details for the new username
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/username'
+      responses:
+        "204":
+          description: Username was successfully changed.
+        
+        "400":
+          description: |
+            Bad Request. A user with the provided new username already exists.
+          content:
+            application/json: {} 
+        "404":
+          description: |
+            Bad request.
+          content:
+            application/json: {} 
+        '500':
+            $ref: '#/components/responses/InternalServerError'
+          
+
+          
+  /photo:
+    parameters:
+      - in: path
+        name: UserID
+        schema:
+          $ref: '#/components/schemas/user_id'
+        required: true
+
+    post:
+      tags: ["photos"]
+      summary: Upload Photo to a User's Feed
+      operationId: uploadPhoto
+      description: >
+        Adds a photo to the user's profile, placing it at the top of the user's feed.
+        This operation accepts both an image file and an accompanying text.
+      requestBody:
+        description: Picture and Text Upload
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                picture:
+                  $ref: "#/components/schemas/BinaryImage"
+                description:
+                  type: string
+                  description: Additional text associated with the picture
+    
+      responses:
+        "200":
+          description: |
+            The picture was successfully added to the user's feed. A reference to the post has been sent in the response.
+
+        "400":
+          description: |
+            Bad Request. Ensure a valid picture is provided in the request.
+          content:
+            application/json: {} 
+        '500':
+            $ref: '#/components/responses/InternalServerError'
+
+
+
+
+    get:
+      operationId: getUserFeed
+      tags: [photos]
+      summary: Gets a list of photos from user's feed
+      responses:
+        #OK
+        '200':
+          description: The user has been retrieved successfully
+          content: 
+            application/json:
+              schema: { $ref: '#/components/schemas/user_feed'}
+        #BadRequest
+        '400':
+          description: The request was not valid. Possible invalid user_id.
+        #Unauthorized
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        #InternalServerError
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+            
+
+    
+
+
+  /deletephoto/{pictureID}:
+    delete:
+      operationId: deletePhoto
+      tags:
+        - photos
+      summary: Deletes a photo
+      description: Deleting a photo by its ID.
+      parameters:
+        - in: path
+          name: picture_id
+          required: true
+          schema:
+            type: integer  # Adjust schema if picture_id is not an integer
+          description: The numeric ID of the photo to be deleted.
+      responses:
+        '204':
+          description: The photo has been deleted successfully
+        '400':
+          description: The request was not valid. Can be invalid user_id or picture_id.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /users/{UserID}/Pictures/{PictureId}/Likes:
+    parameters:
+      - in: path
+        name: UserID
+        schema:
+          $ref: '#/components/schemas/user_id'
+        required: true
+        description: The ID of the user performing the like or unlike action.
+      - in: path
+        name: PictureId
+        schema:
+          $ref: '#/components/schemas/picture_id'
+        required: true
+        description: The unique ID of the picture to be liked or unliked.
+
+    put:
+      tags: [likes]
+      operationId: likePhoto
+      summary: Put a Like on the Picture
+      description: >
+        Adds a like to the specified picture by the user.
+      responses:
+        "204":
+          description: Like successfully added.
+        "400":
+          description: Bad Request. The picture may not exist or the like action is not valid.
+          content:
+            application/json: {} 
+        '500':
+            $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags: [likes]
+      operationId: unlikePhoto
+      summary: Delete a Like from the Picture
+      description: >
+        Removes the like from the specified picture by the user.
+      responses:
+        "204":
+          description: Your like was deleted.
+        "400":
+          description: Bad Request. No previous like on this picture or the action is not valid.
+          content:
+            application/json: {} 
+        '500':
+            $ref: '#/components/responses/InternalServerError'
+          
+
+
+  /{UserID}/{PictureId}/Comment:
+    parameters:
+      - in: path
+        name: UserID
+        schema:
+          $ref: '#/components/schemas/user_id'
+        required: true
+      - in: path
+        name: PictureId
+        schema:
+          $ref: '#/components/schemas/picture_id'
+        required: true
+        description: The unique identifier of the picture to which the comment will be added.
+
+    post:
+      tags: [comments]
+      operationId: commentPhoto
+      summary: Add Comment to Picture
+      description: >
+        Adds a comment to the specified picture by the user.
+      requestBody:
+        description: Text of the comment
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/text"
+
+      responses:
+        "200":
+          description: A comment was added successfully.
+          content:
+            application/json: {} 
+        "400":
+          description: Bad Request. The comment cannot be empty.
+          content:
+            application/json: {} 
+        '500':
+            $ref: '#/components/responses/InternalServerError'
+          
+
+  /{UserID}/{CommentID}:
+    parameters:
+      - in: path
+        name: UserID
+        schema:
+          $ref: '#/components/schemas/user_id'
+        required: true
+
+      - in: path
+        name: CommentID
+        schema:
+          $ref: '#/components/schemas/comment_id'
+        required: true
+        description: The unique identifier of the comment to be deleted.
+
+    delete:
+      tags: [comments]
+      operationId: uncommentPhoto
+      summary: Delete Comment from Picture
+      description: >
+        Deletes a comment from the specified picture based on its CommentID, but only if UserOd coincides with the ownerId of a Picture it was put inder or a Comment. A CommentID is required since a user can leave more than one comment per post. 
+      responses:
+        "204":
+          description: Comment was deleted successfully.
+        "400":
+          description: Bad Request. The comment does not belong to the user or is not valid.
+          content:
+            application/json: {} 
+        '500':
+            $ref: '#/components/responses/InternalServerError'
+          
+
+  
+  /following:
+    parameters:
+      - in: path
+        name: UserID
+        schema:
+          $ref: '#/components/schemas/user_id'
+        required: true
+        description: The unique identifier of the user whose list of followings is to be retrieved or modified.
+
+    get:
+      operationId: getFollowingList
+      tags: [followings]
+      summary: Get User's Followings
+      description: Retrieves the list of users that the specified user is following.
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user_list'
+        "400": 
+          description: Bad Request. The request is malformed or the user does not exist.
+          content:
+              application/json: {} 
+        '500':
+            $ref: '#/components/responses/InternalServerError'
+
+  /follow/{userID}:
+    post:
+      tags: [followings]
+      summary: Follow User
+      operationId: followUser
+      description: Subscribes the specified user to another user.
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: The ID of the user to follow.
+          schema:
+            $ref: '#/components/schemas/user_id'
+      responses:
+        "204":
+          description: User subscribed successfully.
+        "201":
+          description: User is already being followed.
+          content:
+            application/json: {}
+        "400":
+          description: Bad Request. The request is malformed, or the target user does not exist.
+          content:
+            application/json: {}
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+          
+    delete:
+      tags: [followings]
+      summary: Unsubscribe User from Another User
+      operationId: unfollowUser
+      description: Unsubscribes the specified user from another user.
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          description: The ID of the user to unfollow.
+          schema:
+            $ref: '#/components/schemas/user_id'
+      responses:
+        "204":
+          description: User unsubscribed successfully.
+        "201":
+          description: User wasn't following the provided user.
+          content:
+            application/json: {}
+        "400":
+          description: Bad Request. The request is malformed or the user to be unfollowed does not exist.
+          content:
+            application/json: {}
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
+
+
+
+
+  /followers:
+    parameters:
+      - in: path
+        name: UserID
+        schema:
+          $ref: '#/components/schemas/user_id'
+        required: true
+        description: The unique identifier of the user whose list of followers is to be retrieved.
+
+    get:
+      operationId: getFollowersList
+      tags: [followings]
+      summary: Get User's Followers
+      description: Retrieves the list of users that follow the specified user.
+      responses:
+        "200":
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user_list'
+        "400": 
+          description: Bad Request. The request is malformed or the user does not exist.
+          content:
+              application/json: {} 
+        '500':
+            $ref: '#/components/responses/InternalServerError'
+   
+
+
+
+
+
+
+
+  /ban/{userID}:
+    parameters:
+      - in: path
+        name: userID
+        schema:
+          $ref: '#/components/schemas/user_id'
+        required: true
+        description: ID of the user to be banned or unbanned.
+
+    post:
+      tags: ["ban"]
+      operationId: banUser
+      summary: Ban User
+      description: Adds the specified user to the list of banned users.
+      responses:
+        "204":
+          description: User banned successfully.
+        "201":
+          description: User is already banned.
+          content:
+            application/json: {}
+        "400":
+          description: Bad Request. No user provided or the request is malformed.
+          content:
+            application/json: {}
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags: ["ban"]
+      summary: Unban User
+      operationId: unbanUser
+      description: Removes the specified user from the list of banned users.
+      responses:
+        "204":
+          description: User unbanned successfully.
+        "201":
+          description: User was not banned.
+          content:
+            application/json: {}
+        "400":
+          description: Bad Request. The request is malformed.
+          content:
+            application/json: {}
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
+
+
+
+
+  /users/{UserID}/getProfile:
+      parameters:
+        - in: path
+          name: UserID
+          schema:
+            $ref: '#/components/schemas/user_id'
+          required: true
+          description: The unique ID of the user whose profile is to be retrieved.
+  
+      get:
+        tags: ["user"]
+        summary: Get User Profile
+        description: Retrieves the profile information of the specified user.
+        operationId: getUserProfile
+        responses:
+          "200":
+            description: Successful response.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/User'
+          "404":
+            description: User not found.
+            content:
+              application/json: {} 
+          '500':
+            $ref: '#/components/responses/InternalServerError'
+
+  /{UserID}/stream/:
+      parameters:
+        - in: path
+          name: UserID
+          schema:
+            $ref: '#/components/schemas/user_id'
+          required: true
+          
+      get:
+        operationId: getMyStream
+        tags: [user]
+        summary: Gets a list of photos from the users that the user is following
+        description: |-
+          The user by the ID
+        responses:
+          #OK
+          '200':
+            description: The user has been retrieved successfully
+            content: 
+              application/json:
+                schema: { $ref: '#/components/schemas/user_stream'}
+          #BadRequest
+          '400':
+            description: The request was not valid. probably Invalid user id
+          #Unauthorized
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          #InternalServerError
+          '500':
+            $ref: '#/components/responses/InternalServerError'
+
+  /search/:
+      get:
+        operationId: search
+        tags: [search]
+        summary: Searches for a user by username.
+        parameters:
+          - name: username
+            in: query
+            description: The username of the user
+            required: true
+            schema:
+              $ref: "#/components/schemas/username"
+        responses:
+          #OK
+          '200':
+            description: The user has been retrieved successfully
+            content: 
+              application/json:
+                schema: { $ref: '#/components/schemas/user_list'}
+          #BadRequest
+          '400':
+            description: The request was not valid. probably Invalid user id
+          #Unauthorized
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          #InternalServerError
+          '500':
+            $ref: '#/components/responses/InternalServerError'
+
+
+components:
+
+###################SCHEMAS####################
+  schemas: 
+    User:
+      title: User
+      description: "This object represents a single user"
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/user_id"
+        username:
+          $ref: "#/components/schemas/username"
+        followerList:
+          $ref: "#/components/schemas/user_list"
+        followingList:
+          $ref: "#/components/schemas/user_list"
+        bannedList:
+          $ref: "#/components/schemas/user_list"
+        photoList:
+          $ref: "#/components/schemas/user_feed"
+      
+      required:  
+        - id
+        - username
+        
+    user_id:
+      description: User's personal and unique id, or identification.
+      type: string
+      example: '13467'
+      minLength: 3
+      maxLength: 16
+
+    username:
+      title: username
+      description: Username of the user, must be unique.
+      type: string
+      pattern: '^.*?$'
+      example: JohnyDoe
+      minLength: 3
+      maxLength: 16
+      
+
+    BinaryImage:
+      description: Binary image.
+      type: string
+      format: binary
+      minLength: 4
+      maxLength: 65535
+      example: iVBORw0KGgoAAAANSU... 
+ 
+    user_feed:
+      title: user_feed
+      description: Contains all of the pictures uploaded by user.
+      type: array
+      minItems: 0
+      maxItems: 100
+      items:
+        $ref: "#/components/schemas/Picture"
+    
+    user_list:
+      title: user_list
+      description: this list contains all the users that I follow
+      type: array
+      minItems: 0
+      maxItems: 100
+      items:
+        $ref: "#/components/schemas/User"
+
+    user_stream:
+      title: user_stream
+      description: this list contains all the photos that I follow
+      type: array
+      minItems: 0
+      maxItems: 100
+      items:
+        $ref: "#/components/schemas/Picture"
+
+
+    Picture:
+      type: object
+      properties:
+        PictureId:
+          $ref: "#/components/schemas/picture_id"
+        ownerId:
+          $ref: "#/components/schemas/user_id"
+        Description:
+          type: string
+          description: The text of the picture description provided by a user.
+          example: Today we had a great time in aquapark!
+        date:
+          type: string
+          format: date-time
+          description: Date and time of uploading the picture
+          example: '12/04/2023-13:06'
+        likes:
+          type: array
+          items: 
+            $ref: '#/components/schemas/UserId'
+          description: People who liked the picture
+        comments:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Comment'
+      required:
+        - PictureId
+        - ownerId
+
+    picture_id:
+      title: picture_id
+      description: "This object represents the id of the picture"
+      type: number
+      format: int64
+      example: 1234
+      readOnly: true
+    
+    
+ 
+    Comment:
+      type: object
+      properties:
+        CommentID:
+          $ref: '#/components/schemas/comment_id'
+        ownerId:
+          $ref: '#/components/schemas/user_id'
+        Content:
+          $ref: '#/components/schemas/text'
+      required:
+        - CommentID
+        - ownerId
+        - Content
+
+    text:
+      description: Comment text.
+      type: string
+      pattern: '^.*?$'
+      minLength: 1
+      maxLength: 2200
+      example: "Nice shot!"
+
+    comment_id:
+      title: comment_id
+      description: "represents the id of the comment"
+      type: number
+      format: int64
+      example: 1234
+      readOnly: true
+
+###################RESPONSES####################
+
+responses:
+    #401
+  Unauthorized:
+      escription: The request was not authorized. The user must log in.
+
+    #403
+  Forbidden:
+    description: The request was not authorized. The user does not have the necessary permissions.
+
+    #500
+  InternalServerError:
+    description: An error occurred on the server. Please try again later.
+
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
