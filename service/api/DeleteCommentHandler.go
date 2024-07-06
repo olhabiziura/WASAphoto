@@ -17,17 +17,19 @@ func (rt *_router)DeleteComment(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// Extract PictureID from URL query parameters
-	PictureID := r.URL.Query().Get("PictureID")
+	PictureID := ps.ByName("pictureID")
 	if PictureID == "" {
-		http.Error(w, "Missing PictureID in query parameters", http.StatusBadRequest)
+		http.Error(w, "Missing pictureID parameter", http.StatusBadRequest)
 		return
 	}
     
-	CommentID := r.URL.Query().Get("CommentID")
+
+	CommentID := ps.ByName("commentID")
 	if CommentID == "" {
-		http.Error(w, "Missing CommentID in query parameters", http.StatusBadRequest)
+		http.Error(w, "Missing commentID parameter", http.StatusBadRequest)
 		return
 	}
+
 
 
 	// Delete the comment from the database

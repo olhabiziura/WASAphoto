@@ -9,7 +9,7 @@ import (
 func (db *appdbimpl) DeletePhoto(userID, photoID string) (string, error) {
 	// Query to fetch photo address and delete the photo record
 	var filePath string
-	err := db.GetDB().QueryRow("SELECT address FROM pictures WHERE ownerID = ? AND photoID = ?", userID, photoID).Scan(&filePath)
+	err := db.GetDB().QueryRow("SELECT address FROM pictures WHERE ownerID = ? AND pictureID = ?", userID, photoID).Scan(&filePath)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return "", fmt.Errorf("photo not found")
@@ -18,7 +18,7 @@ func (db *appdbimpl) DeletePhoto(userID, photoID string) (string, error) {
 	}
 
 	// Execute delete query
-	_, err = db.GetDB().Exec("DELETE FROM pictures WHERE ownerID = ? AND photoID = ?", userID, photoID)
+	_, err = db.GetDB().Exec("DELETE FROM pictures WHERE ownerID = ? AND pictureID = ?", userID, photoID)
 	if err != nil {
 		return "", fmt.Errorf("error deleting photo: %v", err)
 	}

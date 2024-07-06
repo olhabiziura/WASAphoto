@@ -17,12 +17,15 @@ func (rt *_router)AddLike(w http.ResponseWriter, r *http.Request,  ps httprouter
 	}
 
     // Extract PictureID from URL parameters
-    PictureID := r.URL.Query().Get("PictureID")
-
+    PictureID := ps.ByName("pictureID")
+	if PictureID == "" {
+		http.Error(w, "Missing pictureID parameter", http.StatusBadRequest)
+		return
+	}
     // Insert into the database
     err := rt.db.AddLike(UserID, PictureID)
     if err != nil {
-        http.Error(w, "Failed to add picture", http.StatusInternalServerError)
+        http.Error(w, "Failed to add like to a picture", http.StatusInternalServerError)
         return
     }
 

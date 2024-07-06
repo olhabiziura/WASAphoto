@@ -17,12 +17,16 @@ func (rt *_router) DeleteLike(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
     // Extract PictureID from URL parameters
-    PictureID := r.URL.Query().Get("PictureID")
+    PictureID := ps.ByName("pictureID")
+	if PictureID == "" {
+		http.Error(w, "Missing pictureID parameter", http.StatusBadRequest)
+		return
+	}
 
 
     err := rt.db.DeleteLike(UserID, PictureID)
     if err != nil {
-		http.Error(w, "Failed to delete picture", http.StatusInternalServerError)
+		http.Error(w, "Failed to delete like", http.StatusInternalServerError)
 		return
 	}
 

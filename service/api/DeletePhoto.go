@@ -17,9 +17,9 @@ func (rt *_router) DeletePhotoHandler(w http.ResponseWriter, r *http.Request, ps
 	}
 
 	// Get photoID from URL parameters
-	photoID := ps.ByName("picture_id")
+	photoID := ps.ByName("pictureID")
 	if photoID == "" {
-		http.Error(w, "Missing picture_id parameter", http.StatusBadRequest)
+		http.Error(w, "Missing pictureID parameter", http.StatusBadRequest)
 		return
 	}
 

@@ -111,9 +111,10 @@ paths:
           
 
           
+
+
+
   /photo:
-
-
     post:
       tags: ["photos"]
       summary: Upload Photo to a User's Feed
@@ -122,30 +123,42 @@ paths:
         Adds a photo to the user's profile, placing it at the top of the user's feed.
         This operation accepts both an image file and an accompanying text.
       requestBody:
-        description: Picture and Text Upload
+        required: true
         content:
           multipart/form-data:
             schema:
               type: object
               properties:
                 picture:
-                  $ref: "#/components/schemas/BinaryImage"
+                  type: string
+                  format: binary
                 description:
                   type: string
-                  description: Additional text associated with the picture
-    
+              required:
+                - picture
+
+
+
       responses:
         "200":
-          description: |
-            The picture was successfully added to the user's feed. A reference to the post has been sent in the response.
+          description: The picture was successfully added to the user's feed. A reference to the post has been sent in the response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  file:
+                    type: string  
 
         "400":
-          description: |
-            Bad Request. Ensure a valid picture is provided in the request.
+          description: Bad Request. Ensure a valid picture is provided in the request.
           content:
-            application/json: {} 
-        '500':
-            $ref: '#/components/responses/InternalServerError'
+            application/json: {}
+        
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
 
 
@@ -190,8 +203,7 @@ paths:
           name: pictureID
           required: true
           schema:
-            type: integer  # Adjust schema if picture_id is not an integer
-          description: The numeric ID of the photo to be deleted.
+            $ref: '#/components/schemas/picture_id'
       responses:
         '204':
           description: The photo has been deleted successfully
@@ -203,16 +215,10 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
 
-  /users/{UserID}/Pictures/{PictureId}/Likes:
+  /like/{PictureID}:
     parameters:
       - in: path
-        name: UserID
-        schema:
-          $ref: '#/components/schemas/user_id'
-        required: true
-        description: The ID of the user performing the like or unlike action.
-      - in: path
-        name: PictureId
+        name: PictureID
         schema:
           $ref: '#/components/schemas/picture_id'
         required: true
@@ -252,13 +258,8 @@ paths:
           
 
 
-  /{UserID}/{PictureId}/Comment:
+  /addcomment/{PictureId}:
     parameters:
-      - in: path
-        name: UserID
-        schema:
-          $ref: '#/components/schemas/user_id'
-        required: true
       - in: path
         name: PictureId
         schema:
@@ -293,13 +294,14 @@ paths:
             $ref: '#/components/responses/InternalServerError'
           
 
-  /{UserID}/{CommentID}:
+  /deletecomment/{PictureID}/{CommentID}:
     parameters:
       - in: path
-        name: UserID
+        name: PictureID
         schema:
-          $ref: '#/components/schemas/user_id'
+          $ref: '#/components/schemas/picture_id'
         required: true
+        description: The unique identifier of the picture to which the comment will be added.
 
       - in: path
         name: CommentID
@@ -684,9 +686,8 @@ components:
     picture_id:
       title: picture_id
       description: "This object represents the id of the picture"
-      type: number
-      format: int64
-      example: 1234
+      type: string
+      example: "1234"
       readOnly: true
     
     
