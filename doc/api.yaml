@@ -54,27 +54,34 @@ paths:
 
       operationId: doLogin
       requestBody:
-        description: User details
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/username'
-        required: true
+              $ref: '#/components/schemas/User'
       responses:
-        "200":
-          description: |
-            User log-in action successful
+        '200':
+          description: User logged in successfully
           content:
             application/json:
-             schema:
-                $ref: '#/components/schemas/user_id'
-        "400": 
-          description: |
-            Bad request, username doesn't fit in criterias 
-          content:
-            application/json: {} 
-        "500": 
-          $ref: '#/components/responses/InternalServerError'
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                  user_id:
+                    type: string
+                    description: The ID of the logged-in user
+                  username:
+                    type: string
+                    description: The username of the logged-in user
+        '400':
+          description: Bad request. Invalid username or missing username in request body.
+        '401':
+          description: Unauthorized. Failed to authenticate user.
+        '500':
+          description: Internal server error. Failed to process the login request.
 
 
 
@@ -86,29 +93,22 @@ paths:
         Changes the existing username to a new one, provided that no other registered user already has this name.
       operationId: setMyUserName
       requestBody:
-        description: Details for the new username
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/username'
       responses:
-        "204":
-          description: Username was successfully changed.
-        
-        "400":
-          description: |
-            Bad Request. A user with the provided new username already exists.
-          content:
-            application/json: {} 
-        "404":
-          description: |
-            Bad request.
-          content:
-            application/json: {} 
+        '204':
+          description: Username updated successfully
+        '400':
+          description: Bad request. Invalid or missing username in request body.
+        '401':
+          description: Unauthorized. Missing authorization header.
+        '409':
+          description: Conflict. Username is already taken.
         '500':
-            $ref: '#/components/responses/InternalServerError'
-          
+          description: Internal server error. Failed to process the username update request.
 
           
 
@@ -134,31 +134,20 @@ paths:
                   format: binary
                 description:
                   type: string
-              required:
-                - picture
-
-
-
+                  description: Description of the photo
       responses:
-        "200":
-          description: The picture was successfully added to the user's feed. A reference to the post has been sent in the response.
+        '200':
+          description: Photo uploaded and added successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  file:
-                    type: string  
-
-        "400":
-          description: Bad Request. Ensure a valid picture is provided in the request.
-          content:
-            application/json: {}
-        
-        "500":
-          $ref: '#/components/responses/InternalServerError'
+                $ref: '#/components/schemas/Picture'
+        '400':
+          description: Bad request. Missing required parameters or failed to parse multipart form.
+        '401':
+          description: Unauthorized. Missing authorization header.
+        '500':
+          description: Internal server error. Failed to upload or add photo.
 
 
 
@@ -168,23 +157,20 @@ paths:
       tags: [photos]
       summary: Gets a list of photos from user's feed
       responses:
-        #OK
         '200':
-          description: The user has been retrieved successfully
-          content: 
+          description: Photo feed retrieved successfully
+          content:
             application/json:
-              schema: { $ref: '#/components/schemas/user_feed'}
-        #BadRequest
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Picture'
         '400':
-          description: The request was not valid. Possible invalid user_id.
-        #Unauthorized
+          description: Bad request. Missing authorization header.
         '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        #InternalServerError
+          description: Unauthorized. Missing or invalid authorization token.
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          description: Internal server error. Failed to retrieve photo feed.
 
             
 
@@ -215,30 +201,32 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
 
+
   /like/{PictureID}:
     parameters:
       - in: path
         name: PictureID
-        schema:
-          $ref: '#/components/schemas/picture_id'
         required: true
+        schema:
+          type: string
+          example: "123456789"  # Replace with actual example if needed
         description: The unique ID of the picture to be liked or unliked.
 
-    put:
+    post:
       tags: [likes]
+      summary: Like or Unlike a Picture
       operationId: likePhoto
-      summary: Put a Like on the Picture
-      description: >
-        Adds a like to the specified picture by the user.
+      description: Adds or removes a like from the specified picture.
       responses:
-        "204":
-          description: Like successfully added.
-        "400":
-          description: Bad Request. The picture may not exist or the like action is not valid.
-          content:
-            application/json: {} 
+        '204':
+          description: Like added or removed successfully
+        '400':
+          description: Bad request. Missing required parameters or invalid input.
+        '401':
+          description: Unauthorized. Missing authorization header or invalid credentials.
         '500':
-            $ref: '#/components/responses/InternalServerError'
+          description: Internal server error. Failed to process the like operation.
+
 
     delete:
       tags: [likes]
@@ -258,40 +246,54 @@ paths:
           
 
 
-  /addcomment/{PictureId}:
-    parameters:
-      - in: path
-        name: PictureId
-        schema:
-          $ref: '#/components/schemas/picture_id'
-        required: true
-        description: The unique identifier of the picture to which the comment will be added.
-
+  /addcomment/{pictureID}:
     post:
       tags: [comments]
       operationId: commentPhoto
-      summary: Add Comment to Picture
-      description: >
-        Adds a comment to the specified picture by the user.
+      summary: Add a comment to a picture
+      parameters:
+        - in: path
+          name: pictureID
+          required: true
+          schema:
+            type: string
+          description: The ID of the picture to add a comment to
       requestBody:
-        description: Text of the comment
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/text"
-
+              type: object
+              properties:
+                text:
+                  type: string
+                  example: "This is a comment."
       responses:
-        "201":
-          description: A comment was added successfully.
+        '201':
+          description: Comment added successfully
           content:
-            application/json: {} 
-        "400":
-          description: Bad Request. The comment cannot be empty.
-          content:
-            application/json: {} 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Comment added successfully
+                  comment:
+                    type: object
+                    properties:
+                      ownerID:
+                        type: string
+                        example: "user123"
+                      content:
+                        type: string
+                        example: "This is a comment."
+        '400':
+          description: Bad request. Missing required parameters or empty comment text.
+        '401':
+          description: Unauthorized. Missing authorization header.
         '500':
-            $ref: '#/components/responses/InternalServerError'
+          description: Internal server error. Failed to add a comment.
           
 
   /deletecomment/{PictureID}/{CommentID}:
@@ -433,35 +435,36 @@ paths:
 
 
 
-
   /profile/{UserID}:
-      parameters:
-        - in: path
-          name: UserID
-          schema:
-            $ref: '#/components/schemas/user_id'
-          required: true
-          description: The unique ID of the user whose profile is to be retrieved.
-  
-      get:
-        tags: ["user"]
-        summary: Get User Profile
-        description: Retrieves the profile information of the specified user.
-        operationId: getUserProfile
-        responses:
-          "200":
-            description: Successful response.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/User'
-          "404":
-            description: User not found.
-            content:
-              application/json: {} 
-          '500':
-            $ref: '#/components/responses/InternalServerError'
+    parameters:
+      - in: path
+        name: UserID
+        required: true
+        schema:
+          type: string
+          example: "123456789"  # Replace with actual example if needed
+        description: The unique ID of the user whose profile is to be retrieved.
 
+    get:
+      tags: ["user"]
+      summary: Get User Profile
+      description: Retrieves the profile information of the specified user.
+      operationId: getUserProfile
+      responses:
+        '200':
+          description: Profile information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '400':
+          description: Bad request. Missing required parameters.
+        '401':
+          description: Unauthorized. Missing authorization header.
+        '404':
+          description: User profile not found.
+        '500':
+          description: Internal server error. Failed to retrieve profile information.
 
 
   /stream:
@@ -474,7 +477,7 @@ paths:
         Retrieves a list of up to 5 pictures from each user that the authenticated user is following.
       responses:
         '200':
-          description: Successfully retrieved user stream.
+          description: User stream retrieved successfully
           content:
             application/json:
               schema:
@@ -482,20 +485,18 @@ paths:
                 items:
                   $ref: '#/components/schemas/Picture'
         '400':
-          description: Invalid request. Missing or invalid user ID.
+          description: Bad request. Missing authorization header.
         '401':
-          $ref: '#/components/responses/Unauthorized'
+          description: Unauthorized. Missing or invalid authorization token.
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          description: Internal server error. Failed to retrieve user stream.
 
 
 components:
 
 ###################SCHEMAS####################
   schemas: 
-    User:
-      title: User
-      description: "This object represents a single user"
+    Profile:
       type: object
       properties:
         UserID:
@@ -509,12 +510,19 @@ components:
         banList:
           $ref: "#/components/schemas/user_list"
         photoList:
-          $ref: "#/components/schemas/user_feed"
-      
+          $ref: "#/components/schemas/user_feed"      
       required:  
         - id
         - username
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          description: The username of the user trying to log in
+
         
+          
     user_id:
       description: User's personal and unique id, or identification.
       type: string
@@ -575,10 +583,6 @@ components:
           $ref: "#/components/schemas/picture_id"
         ownerId:
           $ref: "#/components/schemas/user_id"
-        Description:
-          type: string
-          description: The text of the picture description provided by a user.
-          example: Today we had a great time in aquapark!
         date:
           type: string
           format: date-time
@@ -593,6 +597,10 @@ components:
           type: array
           items: 
             $ref: '#/components/schemas/Comment'
+        image:
+          type: string
+          format: byte
+          description: Base64 encoded image data
       required:
         - PictureId
         - ownerId
