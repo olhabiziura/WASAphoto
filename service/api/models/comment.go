@@ -5,9 +5,7 @@ import (
 )
 
 type Comment struct {
-	CommentID string    `json:"commentID"`
-	PictureID string       `db:"pictureID"` 
-	OwnerID   User      `json:"ownerID"` 
+	OwnerID   string      `json:"ownerID"` 
 	Content   string    `json:"text"`
 	Date      time.Time `json:"date"`
 }

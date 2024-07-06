@@ -7,8 +7,8 @@ import (
 type Picture struct {
 	PictureID string    `db:"pictureID"`
 	OwnerID   string    `db:"ownerID"`
-	Likes     []User `json:"likes"`
+	Likes     []string `json:"likes"`
+	Comments []Comment `json:comments`
 	Date    time.Time `db:"date"`
-	Format   string  `db:"format"`
 	Address string `db:"address"`
 }

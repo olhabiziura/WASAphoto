@@ -12,6 +12,7 @@ func (rt *_router) Handler() http.Handler {
 	
 
 	rt.router.POST("/photo", rt.AddPhotoHandler)
+	rt.router.GET("/photo",rt.GetUserFeed)
 	rt.router.DELETE("/deletephoto/:pictureID", rt.DeletePhotoHandler)
 
 
@@ -33,6 +34,7 @@ func (rt *_router) Handler() http.Handler {
     rt.router.POST("/session", rt.Login)
 	rt.router.PUT("/username",rt.SetUsernameHandler)
 	rt.router.GET("/profile/:userID",rt.GetProfile)
+	rt.router.GET("/stream",rt.GetUserStream)
 
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)

@@ -327,28 +327,6 @@ paths:
             $ref: '#/components/responses/InternalServerError'
           
 
-  
-  /following:
-
-    get:
-      operationId: getFollowingList
-      tags: [followings]
-      summary: Get User's Followings
-      description: Retrieves the list of users that the specified user is following.
-      responses:
-        "200":
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/user_list'
-        "400": 
-          description: Bad Request. The request is malformed or the user does not exist.
-          content:
-              application/json: {} 
-        '500':
-            $ref: '#/components/responses/InternalServerError'
-
   /follow/{userID}:
     post:
       tags: [followings]
@@ -401,36 +379,6 @@ paths:
             application/json: {}
         "500":
           $ref: '#/components/responses/InternalServerError'
-
-
-
-
-
-
-  /followers:
-    get:
-      operationId: getFollowersList
-      tags: [followings]
-      summary: Get User's Followers
-      description: Retrieves the list of users that follow the specified user.
-      responses:
-        "200":
-          description: Successful response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/user_list'
-        "400": 
-          description: Bad Request. The request is malformed or the user does not exist.
-          content:
-              application/json: {} 
-        '500':
-            $ref: '#/components/responses/InternalServerError'
-   
-
-
-
-
 
 
 
@@ -516,65 +464,29 @@ paths:
 
 
 
-  /{UserID}/stream/:
-      parameters:
-        - in: path
-          name: UserID
-          schema:
-            $ref: '#/components/schemas/user_id'
-          required: true
-          
-      get:
-        operationId: getMyStream
-        tags: [user]
-        summary: Gets a list of photos from the users that the user is following
-        description: |-
-          The user by the ID
-        responses:
-          #OK
-          '200':
-            description: The user has been retrieved successfully
-            content: 
-              application/json:
-                schema: { $ref: '#/components/schemas/user_stream'}
-          #BadRequest
-          '400':
-            description: The request was not valid. probably Invalid user id
-          #Unauthorized
-          '401':
-            $ref: '#/components/responses/Unauthorized'
-          #InternalServerError
-          '500':
-            $ref: '#/components/responses/InternalServerError'
-
-  /search/:
-      get:
-        operationId: search
-        tags: [search]
-        summary: Searches for a user by username.
-        parameters:
-          - name: username
-            in: query
-            description: The username of the user
-            required: true
-            schema:
-              $ref: "#/components/schemas/username"
-        responses:
-          #OK
-          '200':
-            description: The user has been retrieved successfully
-            content: 
-              application/json:
-                schema: { $ref: '#/components/schemas/user_list'}
-          #BadRequest
-          '400':
-            description: The request was not valid. probably Invalid user id
-          #Unauthorized
-          '401':
-            $ref: '#/components/responses/Unauthorized'
-          #InternalServerError
-          '500':
-            $ref: '#/components/responses/InternalServerError'
+  /stream:
+    get:
+      operationId: getMyStream
+      tags:
+        - user
+      summary: Get User Stream
+      description: |
+        Retrieves a list of up to 5 pictures from each user that the authenticated user is following.
+      responses:
+        '200':
+          description: Successfully retrieved user stream.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Picture'
+        '400':
+          description: Invalid request. Missing or invalid user ID.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
 
 components:
@@ -644,7 +556,7 @@ components:
       minItems: 0
       maxItems: 100
       items:
-        $ref: "#/components/schemas/User"
+        $ref: "#/components/schemas/user_id"
 
     user_stream:
       title: user_stream

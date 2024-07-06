@@ -47,9 +47,11 @@ type AppDatabase interface {
 
     AddComment(userID, pictureID, content string) error
 	DeleteComment(userID, pictureID, commentID string) error
-
+	GetComments(pictureID string) ([]models.Comment, error)
+	
 	AddLike(userID, pictureID string) error
 	DeleteLike(userID, pictureID string) error
+	GetLikes(pictureID string) ([]string, error)
 
 	AddBan(userID, BannedID string) error
 	DeleteBan(userID, BannerID string) error

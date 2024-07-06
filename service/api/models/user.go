@@ -14,6 +14,6 @@ type Profile struct {
 	FollowerList  []string  `json:"followerList"`
     FollowingList []string  `json:"followingList"`
     BanList       []string  `json:"banList"`
-    PhotoList     []string `json:"photoList"`
+    PhotoList     []Picture `json:"photoList"`
 }
 
