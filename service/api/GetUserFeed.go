@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"wasaphoto/service/api/models"
+
 )
 
-func (rt *_router) GetFeedHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) GetUserFeed(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Get UserID from Authorization header
 	userID := r.Header.Get("Authorization")
 	if userID == "" {

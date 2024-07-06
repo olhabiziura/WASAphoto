@@ -1,8 +1,6 @@
 package database
 
 import (
-	"errors"
-	"time"
 	"wasaphoto/service/api/models"
 )
 

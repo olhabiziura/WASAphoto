@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-
+	"wasaphoto/service/api/models"
 	"github.com/julienschmidt/httprouter"
 )
 

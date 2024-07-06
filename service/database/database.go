@@ -31,80 +31,76 @@ Then you can initialize the AppDatabase and pass it to the api package.
 package database
 
 import (
-	"database/sql"
-	"errors"
-	"fmt"
-	"time"
-
+    "database/sql"
+    "errors"
+    "fmt"
+    "time"
+    "wasaphoto/service/api/models"
 )
 
 // AppDatabase is the high-level interface for the DB
 type AppDatabase interface {
-
-
-	AddPhoto(ownerID, address string, date time.Time, description string) error
-	DeletePhoto(userID, photoID string) (string, error)
+    AddPhoto(ownerID, address string, date time.Time, description string) error
+    DeletePhoto(userID, photoID string) (string, error)
 
     AddComment(userID, pictureID, content string) error
-	DeleteComment(userID, pictureID, commentID string) error
-	GetComments(pictureID string) ([]models.Comment, error)
-	
-	AddLike(userID, pictureID string) error
-	DeleteLike(userID, pictureID string) error
-	GetLikes(pictureID string) ([]string, error)
+    DeleteComment(userID, pictureID, commentID string) error
+    GetComments(pictureID string) ([]models.Comment, error)
 
-	AddBan(userID, BannedID string) error
-	DeleteBan(userID, BannerID string) error
-	GetBan(userID string) ([]string, error) 
+    AddLike(userID, pictureID string) error
+    DeleteLike(userID, pictureID string) error
+    GetLikes(pictureID string) ([]string, error)
 
+    AddBan(userID, bannedID string) error
+    DeleteBan(userID, bannedID string) error
+    GetBan(userID string) ([]string, error)
 
-	AddFollower(followerID, followingID string)error
-	DeleteFollower(followerID, followingID string)error
-	GetFollowers(userID string) ([]string, error)
-	GetFollowing(userID string) ([]string, error)
+    AddFollower(followerID, followingID string) error
+    DeleteFollower(followerID, followingID string) error
+    GetFollowers(userID string) ([]string, error)
+    GetFollowing(userID string) ([]string, error)
 
-	AddUser(username string) (int64, error)
-	Login(username string) (int64, error)
-	SetUsername(userID, username string) error
-	GetUsername(userID string) (string, error)
-	GetFeed(userID string) ([]string, error) 
+    AddUser(username string) (int64, error)
+    Login(username string) (int64, error)
+    SetUsername(userID, username string) error
+    GetUsername(userID string) (string, error)
+    GetFeed(userID string) ([]models.Picture, error)
 
-	Ping() error
-    GetDB() *sql.DB // Add this method to the interface
+    Ping() error
+    GetDB() *sql.DB
 }
 
 type appdbimpl struct {
-	c *sql.DB
+    c *sql.DB
 }
 
 // New returns a new instance of AppDatabase based on the SQLite connection `db`.
 // `db` is required - an error will be returned if `db` is `nil`.
 func New(db *sql.DB) (AppDatabase, error) {
-	if db == nil {
-		return nil, errors.New("database is required when building an AppDatabase")
-	}
+    if db == nil {
+        return nil, errors.New("database is required when building an AppDatabase")
+    }
 
-	// Check if table exists. If not, the database is empty, and we need to create the structure
-	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
-	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
-		_, err = db.Exec(sqlStmt)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
-	}
+    // Check if table exists. If not, the database is empty, and we need to create the structure
+    var tableName string
+    err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
+    if errors.Is(err, sql.ErrNoRows) {
+        sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
+        _, err = db.Exec(sqlStmt)
+        if err != nil {
+            return nil, fmt.Errorf("error creating database structure: %w", err)
+        }
+    }
 
-	return &appdbimpl{
-		c: db,
-	}, nil
+    return &appdbimpl{
+        c: db,
+    }, nil
 }
 
 func (db *appdbimpl) Ping() error {
-	return db.c.Ping()
+    return db.c.Ping()
 }
 
 func (db *appdbimpl) GetDB() *sql.DB {
-	return db.c
+    return db.c
 }
-

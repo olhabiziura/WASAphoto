@@ -1,11 +1,5 @@
 package database
 
-package database
-
-import (
-	"database/sql"
-)
-
 // GetLikesByPictureID retrieves a list of userIDs who liked a specific pictureID
 func (db *appdbimpl) GetLikes(pictureID string) ([]string, error) {
 	var userIDs []string

@@ -1,8 +1,5 @@
 package database
 
-import (
-	"errors"
-)
 
 func (db *appdbimpl) GetFollowers(userID string) ([]string, error) {
 	var followerList []string

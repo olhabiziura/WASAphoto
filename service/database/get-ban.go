@@ -1,8 +1,5 @@
 package database
 
-import (
-	"errors"
-)
 
 func (db *appdbimpl) GetBan(userID string) ([]string, error) {
 	var banList []string
