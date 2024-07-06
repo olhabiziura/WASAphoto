@@ -62,6 +62,7 @@ func (rt *_router) AddPhotoHandler(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	// Send success response
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	response := map[string]string{
 		"message": "The picture was successfully added to the user's feed.",

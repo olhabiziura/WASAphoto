@@ -7,8 +7,7 @@ import (
 
 )
 
-func (rt *_router)DeleteComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-
+func (rt *_router) DeleteComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Extract UserID from request headers
 	UserID := r.Header.Get("Authorization")
 	if UserID == "" {
@@ -16,26 +15,31 @@ func (rt *_router)DeleteComment(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	// Extract PictureID from URL query parameters
-	PictureID := ps.ByName("pictureID")
+	// Extract PictureID and CommentID from URL parameters
+	PictureID := ps.ByName("PictureID")
 	if PictureID == "" {
-		http.Error(w, "Missing pictureID parameter", http.StatusBadRequest)
+		http.Error(w, "Missing PictureID parameter", http.StatusBadRequest)
 		return
 	}
-    
 
-	CommentID := ps.ByName("commentID")
+	CommentID := ps.ByName("CommentID")
 	if CommentID == "" {
-		http.Error(w, "Missing commentID parameter", http.StatusBadRequest)
+		http.Error(w, "Missing CommentID parameter", http.StatusBadRequest)
 		return
 	}
-
-
 
 	// Delete the comment from the database
 	err := rt.db.DeleteComment(UserID, PictureID, CommentID)
 	if err != nil {
-		http.Error(w, "Failed to delete comment", http.StatusInternalServerError)
+		// Check specific error conditions and return appropriate status codes
+		switch err.Error() {
+		case "comment not found":
+			http.Error(w, "Comment not found", http.StatusBadRequest)
+		case "comment does not belong to user":
+			http.Error(w, "Comment does not belong to the user", http.StatusBadRequest)
+		default:
+			http.Error(w, "Failed to delete comment", http.StatusInternalServerError)
+		}
 		return
 	}
 

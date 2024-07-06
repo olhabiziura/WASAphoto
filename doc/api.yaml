@@ -282,7 +282,7 @@ paths:
               $ref: "#/components/schemas/text"
 
       responses:
-        "200":
+        "201":
           description: A comment was added successfully.
           content:
             application/json: {} 
@@ -317,7 +317,7 @@ paths:
       description: >
         Deletes a comment from the specified picture based on its CommentID, but only if UserOd coincides with the ownerId of a Picture it was put inder or a Comment. A CommentID is required since a user can leave more than one comment per post. 
       responses:
-        "204":
+        "200":
           description: Comment was deleted successfully.
         "400":
           description: Bad Request. The comment does not belong to the user or is not valid.
@@ -486,7 +486,7 @@ paths:
 
 
 
-  /users/{UserID}/getProfile:
+  /profile/{UserID}:
       parameters:
         - in: path
           name: UserID
@@ -513,6 +513,8 @@ paths:
               application/json: {} 
           '500':
             $ref: '#/components/responses/InternalServerError'
+
+
 
   /{UserID}/stream/:
       parameters:
@@ -584,15 +586,15 @@ components:
       description: "This object represents a single user"
       type: object
       properties:
-        id:
+        UserID:
           $ref: "#/components/schemas/user_id"
-        username:
+        Username:
           $ref: "#/components/schemas/username"
         followerList:
           $ref: "#/components/schemas/user_list"
         followingList:
           $ref: "#/components/schemas/user_list"
-        bannedList:
+        banList:
           $ref: "#/components/schemas/user_list"
         photoList:
           $ref: "#/components/schemas/user_feed"

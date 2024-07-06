@@ -53,14 +53,19 @@ type AppDatabase interface {
 
 	AddBan(userID, BannedID string) error
 	DeleteBan(userID, BannerID string) error
+	GetBan(userID string) ([]string, error) 
+
 
 	AddFollower(followerID, followingID string)error
 	DeleteFollower(followerID, followingID string)error
-
+	GetFollowers(userID string) ([]string, error)
+	GetFollowing(userID string) ([]string, error)
 
 	AddUser(username string) (int64, error)
 	Login(username string) (int64, error)
 	SetUsername(userID, username string) error
+	GetUsername(userID string) (string, error)
+	GetFeed(userID string) ([]string, error) 
 
 	Ping() error
     GetDB() *sql.DB // Add this method to the interface

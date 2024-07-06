@@ -3,58 +3,49 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+
 	"github.com/julienschmidt/httprouter"
-	"io/ioutil"
 )
 
-// AddCommentHandler handles adding comments using net/http package
+// AddCommentHandler handles adding comments using the net/http package
 func (rt *_router) AddComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-
 	// Get UserID from Authorization header
-	UserID := r.Header.Get("Authorization")
-	if UserID == "" {
+	userID := r.Header.Get("Authorization")
+	if userID == "" {
 		http.Error(w, "Missing authorization header", http.StatusBadRequest)
 		return
 	}
 
 	// Get PictureID from path parameter
-	PictureID := ps.ByName("pictureID")
-	if PictureID == "" {
+	pictureID := ps.ByName("PictureId")
+	if pictureID == "" {
 		http.Error(w, "Missing pictureID parameter", http.StatusBadRequest)
 		return
 	}
 
 	// Read comment content from request body
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+	var requestBody map[string]string
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&requestBody); err != nil {
+		http.Error(w, "Failed to parse request body", http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
 
-	// Unmarshal JSON body to get the comment text
-	var requestBody map[string]string
-	err = json.Unmarshal(body, &requestBody)
-	if err != nil {
-		http.Error(w, "Failed to parse request body", http.StatusBadRequest)
-		return
-	}
-
-	Content, ok := requestBody["text"]
-	if !ok {
-		http.Error(w, "Missing 'text' field in request body", http.StatusBadRequest)
+	content, ok := requestBody["text"]
+	if !ok || content == "" {
+		http.Error(w, "Comment text cannot be empty", http.StatusBadRequest)
 		return
 	}
 
 	// Insert comment into the database using the AddComment function
-	err = rt.db.AddComment(UserID, PictureID, Content)
-	if err != nil {
+	if err := rt.db.AddComment(userID, pictureID, content); err != nil {
 		http.Error(w, "Failed to add a comment", http.StatusInternalServerError)
 		return
 	}
 
 	// Respond with success message
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "comment added successfully"})
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Comment added successfully"})
 }

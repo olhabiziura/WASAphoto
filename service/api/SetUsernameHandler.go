@@ -8,6 +8,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// SetUsernameHandler updates a user's username
 func (rt *_router) SetUsernameHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Get UserID from Authorization header
 	userID := r.Header.Get("Authorization")
@@ -30,15 +31,14 @@ func (rt *_router) SetUsernameHandler(w http.ResponseWriter, r *http.Request, ps
 	// Call the database function to set the new username
 	err := rt.db.SetUsername(userID, newUsername.Username)
 	if err != nil {
-		switch err.Error() {
-		case "username %s is already taken":
+		if err.Error() == fmt.Sprintf("username %s is already taken", newUsername.Username) {
 			http.Error(w, fmt.Sprintf("Username %s is already taken", newUsername.Username), http.StatusBadRequest)
-		default:
+		} else {
 			http.Error(w, fmt.Sprintf("Failed to change username: %v", err), http.StatusInternalServerError)
 		}
 		return
 	}
 
 	// Send success response
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusNoContent) // 204 No Content
 }

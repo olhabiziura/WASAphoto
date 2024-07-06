@@ -1,38 +1,32 @@
 package api
 
 import (
-    "encoding/json"
     "net/http"
     "github.com/julienschmidt/httprouter"
-
 )
 
 func (rt *_router) DeleteLike(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-        
     // Extract UserID from request headers
-	UserID := r.Header.Get("Authorization")
-	if UserID == "" {
-		http.Error(w, "Missing user_id in headers", http.StatusBadRequest)
-		return
-	}
+    userID := r.Header.Get("Authorization")
+    if userID == "" {
+        http.Error(w, "Missing authorization header", http.StatusBadRequest)
+        return
+    }
 
     // Extract PictureID from URL parameters
-    PictureID := ps.ByName("pictureID")
-	if PictureID == "" {
-		http.Error(w, "Missing pictureID parameter", http.StatusBadRequest)
-		return
-	}
+    pictureID := ps.ByName("pictureID")
+    if pictureID == "" {
+        http.Error(w, "Missing pictureID parameter", http.StatusBadRequest)
+        return
+    }
 
-
-    err := rt.db.DeleteLike(UserID, PictureID)
+    // Delete the like from the database
+    err := rt.db.DeleteLike(userID, pictureID)
     if err != nil {
-		http.Error(w, "Failed to delete like", http.StatusInternalServerError)
-		return
-	}
+        http.Error(w, "Failed to delete like", http.StatusInternalServerError)
+        return
+    }
 
     // Send success response
-    w.WriteHeader(http.StatusOK)
-    w.Header().Set("Content-Type", "application/json")
-    response := map[string]string{"message": "Like removed successfully"}
-    json.NewEncoder(w).Encode(response)
+    w.WriteHeader(http.StatusNoContent)
 }
