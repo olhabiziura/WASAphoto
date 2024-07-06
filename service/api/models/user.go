@@ -11,8 +11,8 @@ type User struct {
 type Profile struct {
     UserID        string    `db:"userID"`
     Username      string  `db:"username"`
-	FollowerList  []string  `json:"followerList"`
-    FollowingList []string  `json:"followingList"`
+	FollowerList  []User `json:"followerList"`
+    FollowingList []User  `json:"followingList"`
     BanList       []string  `json:"banList"`
     PhotoList     []Picture `json:"photoList"`
 }

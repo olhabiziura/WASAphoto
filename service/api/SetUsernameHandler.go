@@ -38,7 +38,7 @@ func (rt *_router) SetUsernameHandler(w http.ResponseWriter, r *http.Request, ps
 		}
 		return
 	}
-
+	fmt.Println(newUsername.Username)
 	// Send success response
 	w.WriteHeader(http.StatusNoContent) // 204 No Content
 }

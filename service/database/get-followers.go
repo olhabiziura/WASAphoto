@@ -1,31 +1,38 @@
 package database
 
+import (
+	"fmt"
+	"wasaphoto/service/api/models"
+)
 
-func (db *appdbimpl) GetFollowers(userID string) ([]string, error) {
-	var followerList []string
+func (db *appdbimpl) GetFollowers(userID string) ([]models.User, error) {
+	var followerList []models.User
 
-	rows, err := db.c.Query("SELECT FollowerID FROM followers WHERE FollowingID=?", userID)
+	// Construct SQL query with a join to fetch followers and their usernames
+	query := `
+		SELECT u.userID, u.username
+		FROM followers f
+		JOIN users u ON f.FollowerID = u.userID
+		WHERE f.FollowingID=?
+	`
+
+	rows, err := db.c.Query(query, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error querying followers: %v", err)
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var followerID string
-		err := rows.Scan(&followerID)
+		var user models.User
+		err := rows.Scan(&user.UserID, &user.Username)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error scanning follower: %v", err)
 		}
-		followerList = append(followerList, followerID)
+		followerList = append(followerList, user)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	// Check if followerList is empty and return an empty slice instead of an error
-	if len(followerList) == 0 {
-		return []string{}, nil
+		return nil, fmt.Errorf("error iterating over rows: %v", err)
 	}
 
 	return followerList, nil

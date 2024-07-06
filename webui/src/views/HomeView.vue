@@ -1,56 +1,70 @@
 <script>
+// stream
 export default {
-	data: function() {
+	data: function () {
 		return {
-			errormsg: null,
-			loading: false,
-			some_data: null,
+			photos: [],
+			displayUsername: '',
 		}
 	},
 	methods: {
-		async refresh() {
-			this.loading = true;
-			this.errormsg = null;
+		async getMyStream() {
 			try {
-				let response = await this.$axios.get("/");
-				this.some_data = response.data;
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-			this.loading = false;
+				// GET /stream
+                let response = await this.$axios.get('/stream', {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
+				this.photos = response.data === null ? [] : response.data;
+				console.log("jhjhbj"+this.photos)
+				console.log(sessionStorage.getItem('username'))
+				this.displayUsername = sessionStorage.getItem('username');
+			} catch (error) {
+				const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
+            }
 		},
 	},
-	mounted() {
-		this.refresh()
+	async mounted() {
+		await this.getMyStream()
 	}
 }
 </script>
 
 <template>
-	<div>
-		<div
-			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h2">Home page</h1>
-			<div class="btn-toolbar mb-2 mb-md-0">
-				<div class="btn-group me-2">
-					<button type="button" class="btn btn-sm btn-outline-secondary" @click="refresh">
-						Refresh
-					</button>
-					<button type="button" class="btn btn-sm btn-outline-secondary" @click="exportList">
-						Export
-					</button>
-				</div>
-				<div class="btn-group me-2">
-					<button type="button" class="btn btn-sm btn-outline-primary" @click="newItem">
-						New
-					</button>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col">
+				<div class="stream-header">
+				This is {{ displayUsername }}'s stream
 				</div>
 			</div>
 		</div>
-
-		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
+		<div class="row">
+			<Photo v-for="photo in photos"
+			:key="photo.PictureID"
+			:pid="photo.PictureID"
+			:user_id="photo.OwnerID"
+			:username="photo.Username"
+			:date="photo.Date"
+			:likesListParent="photo.likes"
+			:commentsListParent="photo.Comments"
+			:isOwner="false"
+			:image = "photo.image"
+			/>
+		</div>
+		<div v-if="photos.length === 0" class="row">
+			<h1 class="d-flex justify-content-center mt-5" style="color: rgb(0, 0, 0);">There's no content yet, follow somebody!</h1>
+		</div>
 	</div>
 </template>
 
 <style>
+.stream-header {
+    text-transform: uppercase;
+    font-weight: bold;
+	text-align: center;
+	font-size: 3em;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	color: rgb(0, 0, 0)
+  }
 </style>

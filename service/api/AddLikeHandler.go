@@ -14,7 +14,7 @@ func (rt *_router) AddLike(w http.ResponseWriter, r *http.Request, ps httprouter
     }
 
     // Extract PictureID from URL parameters
-    pictureID := ps.ByName("PictureID")
+    pictureID := ps.ByName("pictureID")
     if pictureID == "" {
         http.Error(w, "Missing pictureID parameter", http.StatusBadRequest)
         return

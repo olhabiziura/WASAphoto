@@ -25,16 +25,28 @@ func (rt *_router) GetUserStream(w http.ResponseWriter, r *http.Request, ps http
 	// Retrieve feed for each following (last 5 pictures)
 	var userStream []models.Picture
 	for _, followingID := range followingList {
-		feed, err := rt.db.GetFeed(followingID)
+		feed, err := rt.db.GetFeed(followingID.UserID)
 		if err != nil {
 			http.Error(w, "Failed to get feed for following", http.StatusInternalServerError)
 			return
 		}
 
 		// Add up to 5 pictures from each following to the user stream
+
 		for i := 0; i < 5 && i < len(feed); i++ {
 			userStream = append(userStream, feed[i])
 		}
+	}
+	
+	// Fetch and encode pictures
+	for i, picture := range userStream {
+
+		encodedImage, err := ReadImageAsBase64(picture.Address)
+		if err != nil {
+			http.Error(w, "Failed to read image", http.StatusInternalServerError)
+			return
+		}
+		userStream[i].Image = encodedImage
 	}
 
 	// Send response with user stream

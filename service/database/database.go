@@ -40,7 +40,7 @@ import (
 
 // AppDatabase is the high-level interface for the DB
 type AppDatabase interface {
-    AddPhoto(ownerID, address string, date time.Time, description string) error
+    AddPhoto(ownerID, address string, date time.Time, description string) (int64, error)
     DeletePhoto(userID, photoID string) (string, error)
 
     AddComment(userID, pictureID, content string) error
@@ -57,8 +57,8 @@ type AppDatabase interface {
 
     AddFollower(followerID, followingID string) error
     DeleteFollower(followerID, followingID string) error
-    GetFollowers(userID string) ([]string, error)
-    GetFollowing(userID string) ([]string, error)
+    GetFollowers(userID string) ([]models.User, error)
+    GetFollowing(userID string) ([]models.User, error)
 
     AddUser(username string) (int64, error)
     Login(username string) (int64, error)

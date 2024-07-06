@@ -69,9 +69,23 @@ func (rt *_router) GetProfile(w http.ResponseWriter, r *http.Request, ps httprou
 		http.Error(w, "Failed to retrieve feed", http.StatusInternalServerError)
 		return
 	}
+	
+
+	for i, picture := range feed {
+
+		encodedImage, err := ReadImageAsBase64(picture.Address)
+		if err != nil {
+			http.Error(w, "Failed to read image", http.StatusInternalServerError)
+			return
+		}
+		feed[i].Image = encodedImage
+	}
+
 	profile.PhotoList = feed
 
 	// Encode profile instance in the response and send it back
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(profile)
+
+	
 }

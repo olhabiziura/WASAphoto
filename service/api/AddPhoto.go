@@ -8,11 +8,16 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-
+	"wasaphoto/service/api/models"
 	"github.com/julienschmidt/httprouter"
+	"strconv"
+
 )
 
+
 func (rt *_router) AddPhotoHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var picture models.Picture
+
 	// Get UserID from Authorization header
 	userID := r.Header.Get("Authorization")
 	if userID == "" {
@@ -55,18 +60,28 @@ func (rt *_router) AddPhotoHandler(w http.ResponseWriter, r *http.Request, ps ht
 	description := r.FormValue("description")
 
 	// Call database function to add photo record
-	err = rt.db.AddPhoto(userID, filePath, time.Now(), description)
+	pictureID, err := rt.db.AddPhoto(userID, filePath, time.Now(), description)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to add photo record: %v", err), http.StatusInternalServerError)
 		return
 	}
 
+	// Populate picture struct
+	picture.OwnerID = userID
+	picture.Date = time.Now()
+	picture.PictureID = strconv.FormatInt(pictureID, 10)
+	picture.Address = filePath
+
+	encodedImage, err := ReadImageAsBase64(picture.Address)
+	if err != nil {
+		http.Error(w, "Failed to read image", http.StatusInternalServerError)
+		return
+	}
+
+	picture.Image = encodedImage
+
 	// Send success response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	response := map[string]string{
-		"message": "The picture was successfully added to the user's feed.",
-		"file":    filePath, // Provide some reference to the uploaded file if needed
-	}
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(picture)
 }

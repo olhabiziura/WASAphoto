@@ -19,6 +19,7 @@ func (db *appdbimpl) SetUsername(userID, newUsername string) error {
 
 	// Update the username for the given userID
 	_, err = db.GetDB().Exec("UPDATE users SET username = ? WHERE userID = ?", newUsername, userID)
+	fmt.Println(userID)
 	if err != nil {
 		return fmt.Errorf("error updating username: %v", err)
 	}
