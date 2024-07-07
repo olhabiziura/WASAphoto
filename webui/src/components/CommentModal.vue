@@ -4,6 +4,7 @@ export default {
 		return{
             token: sessionStorage.getItem('token'),
 			text:"",
+
 		}
 	},
 
@@ -34,7 +35,7 @@ export default {
         async uncommentPhoto(comment_id) {
             try {
                 // DELETE /photo/{pid}/comment/{comment_id}
-                await this.$axios.delete(`/deletecomment/${this.pid}/${comment_id}/`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
+                await this.$axios.delete(`/deletecomment/${this.pid}/comment/${comment_id}/`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
                 this.$emit('removeComment', comment_id); // signal to parent
             } catch(error) {
                 const status = error.response.status;
@@ -48,6 +49,7 @@ export default {
     mounted() {
         // Log comments when the component is mounted
         console.log("Comments List:", this.comments);
+
     }
 }
 </script>

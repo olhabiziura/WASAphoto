@@ -19,7 +19,7 @@ func (rt *_router) Handler() http.Handler {
 
 
 	rt.router.POST("/addcomment/:pictureID", rt.AddComment)
-	rt.router.DELETE("/deletecomment/:pictureID/:commentID", rt.DeleteComment)
+	rt.router.DELETE("/deletecomment/:pictureID/comment/:commentID", rt.DeleteComment)
 
 	rt.router.POST("/like/:pictureID", rt.AddLike)
 	rt.router.DELETE("/like/:pictureID", rt.DeleteLike)
