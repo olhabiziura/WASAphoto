@@ -590,7 +590,7 @@ components:
     User:
       type: object
       properties:
-        username:
+        Username:
           type: string
           description: The username of the user trying to log in
 
@@ -694,7 +694,7 @@ components:
       properties:
         CommentID:
           $ref: '#/components/schemas/comment_id'
-        ownerId:
+        OwnerId:
           $ref: '#/components/schemas/user_id'
         Content:
           $ref: '#/components/schemas/text'
