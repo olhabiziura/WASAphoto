@@ -24,6 +24,8 @@ export default {
 
             // getFollowingsList
             followingList: [],
+            
+            banList: [],
 
             userExists: false,
             user_id: 0,
@@ -64,23 +66,37 @@ export default {
                 response = await this.$axios.get(`/profile/${this.user_id}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
                 let profile = response.data;
                 this.username = profile.Username;
-                
-                response = await this.$axios.get(`/ban/${this.user_id}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
-                this.amIBanned = response.data.isBanned;
+                this.banList = profile.banList || []
+                this.amIBanned = this.banList.some(user =>user === sessionStorage.getItem('token'));
                 if (this.amIBanned){
                     await this.$axios.delete(`/unfollow/${this.user_id}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
                     this.getUserProfile();
                 }
+
+                
+                console.log("before")
+                response = await this.$axios.get(`/ban/${this.user_id}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
+                this.isInMyBannedList = response.data.isBanned;
+                console.log("after")
+                console.log(response)
+                
+
+
+                
+            
+        
+
                 // Sort photos by date in descending order
                 this.photosList = profile.photoList.sort((a, b) => new Date(b.Date) - new Date(a.Date));
                
-                this.followerList = profile.followerList
+                this.followerList = profile.followerList || []
                 this.doIFollowUser = this.followerList.some(user => user.UserID === sessionStorage.getItem('token'));
 
-                this.followingList = profile.followingList
+                this.followingList = profile.followingList || []
                 if (sessionStorage.getItem('username') === username.toLowerCase()) {
                     this.isOwner = true;
                 }
+                
                 if (profile.photoList != null) {
                     this.photosCount = profile.photoList.length;
                 } else {
@@ -220,6 +236,9 @@ export default {
         <div v-if="amIBanned" class="row">
             <div class="col-12 d-flex justify-content-center">
                 <h2>Sorry! You have been banned by this user.</h2>
+                <button v-if="!isOwner" @click="banBtn" class="btn btn-danger ms-2">
+                                        {{isInMyBannedList ? "Unban" : "Ban"}}
+                </button>
             </div>
         </div>
         

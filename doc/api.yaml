@@ -54,7 +54,6 @@ paths:
 
       operationId: doLogin
       requestBody:
-        required: true
         content:
           application/json:
             schema:
@@ -87,7 +86,8 @@ paths:
 
   /username:
     put:
-      tags: [user]
+      tags: 
+        - user
       summary: Change User's username
       description: >
         Changes the existing username to a new one, provided that no other registered user already has this name.
@@ -97,7 +97,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/username'
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: The new username to be set
+              required:
+                - username
       responses:
         '204':
           description: Username updated successfully
@@ -109,6 +115,8 @@ paths:
           description: Conflict. Username is already taken.
         '500':
           description: Internal server error. Failed to process the username update request.
+      security:
+        - bearerAuth: []
 
           
 
@@ -123,7 +131,7 @@ paths:
         Adds a photo to the user's profile, placing it at the top of the user's feed.
         This operation accepts both an image file and an accompanying text.
       requestBody:
-        required: true
+
         content:
           multipart/form-data:
             schema:
@@ -141,7 +149,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Picture'
+                $ref: '#/components/schemas/picture'
         '400':
           description: Bad request. Missing required parameters or failed to parse multipart form.
         '401':
@@ -154,7 +162,8 @@ paths:
 
     get:
       operationId: getUserFeed
-      tags: [photos]
+      tags:
+        - photos
       summary: Gets a list of photos from user's feed
       responses:
         '200':
@@ -162,22 +171,27 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Picture'
+                type: object
+                properties:
+                  photos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/picture'
         '400':
           description: Bad request. Missing authorization header.
         '401':
           description: Unauthorized. Missing or invalid authorization token.
         '500':
           description: Internal server error. Failed to retrieve photo feed.
+      security:
+        - bearerAuth: []
 
             
 
     
 
 
-  /deletephoto/{pictureID}:
+  /deletephoto/{picture_id}:
     delete:
       operationId: deletePhoto
       tags:
@@ -186,7 +200,7 @@ paths:
       description: Deleting a photo by its ID.
       parameters:
         - in: path
-          name: pictureID
+          name: picture_id
           required: true
           schema:
             $ref: '#/components/schemas/picture_id'
@@ -202,15 +216,13 @@ paths:
 
 
 
-  /like/{PictureID}:
+  /like/{picture_id}:
     parameters:
       - in: path
-        name: PictureID
+        name: picture_id
         required: true
         schema:
-          type: string
-          example: "123456789"  # Replace with actual example if needed
-        description: The unique ID of the picture to be liked or unliked.
+          $ref: '#/components/schemas/picture_id'
 
     post:
       tags: [likes]
@@ -246,20 +258,19 @@ paths:
           
 
 
-  /addcomment/{pictureID}:
+  /addcomment/{picture_id}:
     post:
       tags: [comments]
       operationId: commentPhoto
       summary: Add a comment to a picture
       parameters:
         - in: path
-          name: pictureID
+          name: picture_id
           required: true
           schema:
-            type: string
-          description: The ID of the picture to add a comment to
+            $ref: '#/components/schemas/picture_id'
       requestBody:
-        required: true
+
         content:
           application/json:
             schema:
@@ -296,17 +307,17 @@ paths:
           description: Internal server error. Failed to add a comment.
           
 
-  /deletecomment/{PictureID}/{CommentID}:
+  /deletecomment/{picture_id}/{comment_id}:
     parameters:
       - in: path
-        name: PictureID
+        name: picture_id
         schema:
           $ref: '#/components/schemas/picture_id'
         required: true
         description: The unique identifier of the picture to which the comment will be added.
 
       - in: path
-        name: CommentID
+        name: comment_id
         schema:
           $ref: '#/components/schemas/comment_id'
         required: true
@@ -317,7 +328,7 @@ paths:
       operationId: uncommentPhoto
       summary: Delete Comment from Picture
       description: >
-        Deletes a comment from the specified picture based on its CommentID, but only if UserOd coincides with the ownerId of a Picture it was put inder or a Comment. A CommentID is required since a user can leave more than one comment per post. 
+        Deletes a comment from the specified picture based on its comment_id, but only if UserOd coincides with the ownerId of a Picture it was put inder or a Comment. A comment_id is required since a user can leave more than one comment per post. 
       responses:
         "200":
           description: Comment was deleted successfully.
@@ -329,14 +340,14 @@ paths:
             $ref: '#/components/responses/InternalServerError'
           
 
-  /follow/{userID}:
+  /follow/{user_id}:
     post:
       tags: [followings]
       summary: Follow User
       operationId: followUser
       description: Subscribes the specified user to another user.
       parameters:
-        - name: userID
+        - name: user_id
           in: path
           required: true
           description: The ID of the user to follow.
@@ -362,7 +373,7 @@ paths:
       operationId: unfollowUser
       description: Unsubscribes the specified user from another user.
       parameters:
-        - name: userID
+        - name: user_id
           in: path
           required: true
           description: The ID of the user to unfollow.
@@ -384,10 +395,10 @@ paths:
 
 
 
-  /ban/{userID}:
+  /ban/{user_id}:
     parameters:
       - in: path
-        name: userID
+        name: user_id
         schema:
           $ref: '#/components/schemas/user_id'
         required: true
@@ -475,15 +486,13 @@ paths:
 
 
 
-  /profile/{UserID}:
+  /profile/{user_id}:
     parameters:
       - in: path
-        name: UserID
+        name: user_id
         required: true
         schema:
-          type: string
-          example: "123456789"  # Replace with actual example if needed
-        description: The unique ID of the user whose profile is to be retrieved.
+          $ref: '#/components/schemas/user_id'
 
     get:
       tags: ["user"]
@@ -521,17 +530,22 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Picture'
+                type: object
+                properties:
+                  pictures:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/picture'
         '400':
           description: Bad request. Missing authorization header.
         '401':
           description: Unauthorized. Missing or invalid authorization token.
         '500':
           description: Internal server error. Failed to retrieve user stream.
-
-
+      security:
+        - bearerAuth: []
+  
+  
   /search:
     get:
       summary: Search users by username prefix
@@ -540,7 +554,7 @@ paths:
           name: username
           schema:
             type: string
-          required: true
+
           description: Prefix of the username to search for
       responses:
         '200':
@@ -548,16 +562,19 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    userID:
-                      type: string
-                      description: The unique identifier of the user
-                    username:
-                      type: string
-                      description: The username of the user
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        userID:
+                          type: string
+                          description: The unique identifier of the user
+                        username:
+                          type: string
+                          description: The username of the user
         '400':
           description: Invalid request parameters
         '500':
@@ -613,7 +630,7 @@ components:
       maxLength: 16
       
 
-    BinaryImage:
+    binary_image:
       description: Binary image.
       type: string
       format: binary
@@ -628,7 +645,7 @@ components:
       minItems: 0
       maxItems: 100
       items:
-        $ref: "#/components/schemas/Picture"
+        $ref: "#/components/schemas/picture"
     
     user_list:
       title: user_list
@@ -646,10 +663,10 @@ components:
       minItems: 0
       maxItems: 100
       items:
-        $ref: "#/components/schemas/Picture"
+        $ref: "#/components/schemas/picture"
 
 
-    Picture:
+    picture:
       type: object
       properties:
         PictureId:
@@ -673,9 +690,7 @@ components:
           items: 
             $ref: '#/components/schemas/Comment'
         image:
-          type: string
-          format: byte
-          description: Base64 encoded image data
+          $ref: '#/components/schemas/binary_image'
       required:
         - PictureId
         - ownerId
@@ -692,14 +707,14 @@ components:
     Comment:
       type: object
       properties:
-        CommentID:
+        comment_id:
           $ref: '#/components/schemas/comment_id'
         OwnerId:
           $ref: '#/components/schemas/user_id'
         Content:
           $ref: '#/components/schemas/text'
       required:
-        - CommentID
+        - comment_id
         - ownerId
         - Content
 
@@ -714,10 +729,7 @@ components:
     comment_id:
       title: comment_id
       description: "represents the id of the comment"
-      type: number
-      format: int64
-      example: 1234
-      readOnly: true
+      type: string
 
 ###################RESPONSES####################
 

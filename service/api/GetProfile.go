@@ -52,16 +52,15 @@ func (rt *_router) GetProfile(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 	profile.FollowingList = followingList
 
-	// Only get ban list if the profile is the same as the logged-in user
-	if UserID == ProfileID {
-		banList, err := rt.db.GetBan(ProfileID)
-		fmt.Println(err)
-		if err != nil {
-			http.Error(w, "Failed to retrieve ban list", http.StatusInternalServerError)
-			return
-		}
-		profile.BanList = banList
+	
+	banList, err := rt.db.GetBan(ProfileID)
+	fmt.Println(err)
+	if err != nil {
+		http.Error(w, "Failed to retrieve ban list", http.StatusInternalServerError)
+		return
 	}
+	profile.BanList = banList
+	
 
 	// Get feed for the profile
 	feed, err := rt.db.GetFeed(ProfileID)

@@ -36,7 +36,7 @@ func (db *appdbimpl) GetIfBan(userID, bannerID string) (bool, error) {
 	query := "SELECT 1 FROM ban WHERE banID=? AND userID=?"
 
 	// Execute the query
-	rows, err := db.c.Query(query, userID, bannerID)
+	rows, err := db.c.Query(query, bannerID, userID)
 	if err != nil {
 		return false, err
 	}
