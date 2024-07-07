@@ -72,6 +72,10 @@ func (rt *_router) AddPhotoHandler(w http.ResponseWriter, r *http.Request, ps ht
 	picture.PictureID = strconv.FormatInt(pictureID, 10)
 	picture.Address = filePath
 
+	var username string
+	username,err = rt.db.GetUsername(userID)
+	picture.Username = username
+
 	encodedImage, err := ReadImageAsBase64(picture.Address)
 	if err != nil {
 		http.Error(w, "Failed to read image", http.StatusInternalServerError)

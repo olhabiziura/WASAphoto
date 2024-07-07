@@ -435,6 +435,46 @@ paths:
 
 
 
+    get:
+      summary: Check if a user is banned
+      description: Check if the user specified by the Authorization header is banned by the user specified in the path parameter.
+      responses:
+        '200':
+          description: Successful response indicating whether the user is banned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isBanned:
+                    type: boolean
+                    description: Indicates if the user is banned by the specified user.
+        '400':
+          description: Bad Request - Missing or invalid Authorization header or userID parameter.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message detailing what went wrong.
+        '500':
+          description: Internal Server Error - An error occurred while checking the ban status.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message detailing what went wrong.
+      security:
+        - bearerAuth: []
+
+
+
+
   /profile/{UserID}:
     parameters:
       - in: path
@@ -491,6 +531,39 @@ paths:
         '500':
           description: Internal server error. Failed to retrieve user stream.
 
+
+  /search:
+    get:
+      summary: Search users by username prefix
+      parameters:
+        - in: query
+          name: username
+          schema:
+            type: string
+          required: true
+          description: Prefix of the username to search for
+      responses:
+        '200':
+          description: A list of users matching the username prefix
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    userID:
+                      type: string
+                      description: The unique identifier of the user
+                    username:
+                      type: string
+                      description: The username of the user
+        '400':
+          description: Invalid request parameters
+        '500':
+          description: Internal server error
+      security:
+        - bearerAuth: []
 
 components:
 
@@ -583,6 +656,8 @@ components:
           $ref: "#/components/schemas/picture_id"
         ownerId:
           $ref: "#/components/schemas/user_id"
+        Username:
+          $ref: "#/components/schemas/username"
         date:
           type: string
           format: date-time

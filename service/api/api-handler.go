@@ -9,6 +9,7 @@ func (rt *_router) Handler() http.Handler {
 	// Register routes
 	rt.router.GET("/", rt.getHelloWorld)
 	rt.router.GET("/context", rt.wrap(rt.getContextReply))
+	rt.router.GET("/search", rt.SearchUser)
 	
 
 	rt.router.POST("/photo", rt.AddPhotoHandler)
@@ -28,6 +29,7 @@ func (rt *_router) Handler() http.Handler {
 
 	rt.router.POST("/ban/:userID", rt.AddBan)
 	rt.router.DELETE("/ban/:userID", rt.DeleteBan)
+	rt.router.GET("/ban/:userID", rt.GetIfBanned)
 
 
 	//rt.router.POST("/getid", rt.GetUserId)

@@ -30,3 +30,22 @@ func (db *appdbimpl) GetBan(userID string) ([]string, error) {
 
 	return banList, nil
 }
+
+func (db *appdbimpl) GetIfBan(userID, bannerID string) (bool, error) {
+	// Adjusted query to properly use SELECT * FROM and fixed syntax with AND
+	query := "SELECT 1 FROM ban WHERE banID=? AND userID=?"
+
+	// Execute the query
+	rows, err := db.c.Query(query, userID, bannerID)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+
+	// Check if any rows are returned
+	if rows.Next() {
+		return true, nil
+	}
+
+	return false, nil
+}

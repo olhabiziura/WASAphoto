@@ -54,6 +54,7 @@ type AppDatabase interface {
     AddBan(userID, bannedID string) error
     DeleteBan(userID, bannedID string) error
     GetBan(userID string) ([]string, error)
+    GetIfBan(userID, bannerID string) (bool, error) 
 
     AddFollower(followerID, followingID string) error
     DeleteFollower(followerID, followingID string) error
@@ -65,6 +66,7 @@ type AppDatabase interface {
     SetUsername(userID, username string) error
     GetUsername(userID string) (string, error)
     GetFeed(userID string) ([]models.Picture, error)
+    GetUsers(usernamePrefix string) ([]models.User, error)
 
     Ping() error
     GetDB() *sql.DB

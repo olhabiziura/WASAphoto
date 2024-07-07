@@ -13,6 +13,8 @@ export default {
 				// GET /stream
                 let response = await this.$axios.get('/stream', {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
 				this.photos = response.data === null ? [] : response.data;
+				this.photos = this.photos.sort((a, b) => new Date(b.Date) - new Date(a.Date));
+
 				console.log("jhjhbj"+this.photos)
 				console.log(sessionStorage.getItem('username'))
 				this.displayUsername = sessionStorage.getItem('username');

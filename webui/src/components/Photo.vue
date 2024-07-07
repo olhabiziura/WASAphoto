@@ -6,6 +6,7 @@ export default {
 			photoURL: "",
 			liked: false,
             likes: [],
+            
             comments: [],
 		}
 	},
@@ -16,7 +17,6 @@ export default {
 		async deletePhoto() {
 			try {
 				// DELETE /photo/{id}
-          
 				await this.$axios.delete(`/deletephoto/${this.pid}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
 				this.$emit("removePhoto", this.pid);
 			} catch (error) {
@@ -40,7 +40,7 @@ export default {
 				} else {
 					// DELETE /like/{id}
                     await this.$axios.delete(`/like/${this.pid}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
-                    this.likes = this.likes.filter(user => user.user_id != sessionStorage.getItem('token'));
+                    this.likes = this.likes.filter(user_id => user_id != sessionStorage.getItem('token'));
 				}
 				this.liked = !this.liked;
 			} catch (error) {
@@ -69,14 +69,18 @@ export default {
 	async mounted() {
         // Set the photo URL to the base64 encoded image from props
         this.photoURL = `data:image/jpeg;base64,${this.image}`;
-        console.log(this.likes)
+        
         if (this.likesListParent != null) {
-            this.likes = this.likesListParent
+            this.likes = this.likesListParent;
         }
         if (this.commentsListParent != null) {
-            this.comments = this.commentsListParent
+            this.comments = this.commentsListParent;
         }
-		this.liked = this.likes.some(user => user.user_id == sessionStorage.getItem('token'));
+
+        // Check if the current user has already liked the photo
+        
+        this.liked = this.likes.some(userId => userId === sessionStorage.getItem('token'));
+
 	},
 }
 </script>
