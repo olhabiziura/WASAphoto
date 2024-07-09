@@ -1,32 +1,25 @@
 package api
 
 import (
-	"encoding/json"
-	"net/http"
 	"encoding/base64"
-	"io/ioutil"
+	"encoding/json"
 	"github.com/julienschmidt/httprouter"
-	//"path/filepath"
-	"fmt"
-
-
+	"io/ioutil"
+	"net/http"
+	"log"
+	
 )
-
-
-
-
 
 // ReadImageAsBase64 reads an image from the file path and returns it as a base64 encoded string
 func ReadImageAsBase64(filePath string) (string, error) {
 	imageData, err := ioutil.ReadFile(filePath)
-	fmt.Println(err)
+
 	if err != nil {
-		
+
 		return "", err
 	}
 	return base64.StdEncoding.EncodeToString(imageData), nil
 }
-
 
 func (rt *_router) GetUserFeed(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Get UserID from Authorization header
@@ -45,13 +38,12 @@ func (rt *_router) GetUserFeed(w http.ResponseWriter, r *http.Request, ps httpro
 		default:
 			http.Error(w, "Failed to get feed", http.StatusInternalServerError)
 		}
-		
+
 	}
-	fmt.Println(feed)
+
 	// Fetch and encode pictures
 	for i, picture := range feed {
 
-		fmt.Println("kjnljn")
 		encodedImage, err := ReadImageAsBase64(picture.Address)
 		if err != nil {
 			http.Error(w, "Failed to read image", http.StatusInternalServerError)
@@ -65,5 +57,9 @@ func (rt *_router) GetUserFeed(w http.ResponseWriter, r *http.Request, ps httpro
 	w.WriteHeader(http.StatusOK)
 
 	// Marshal feed to JSON and send response
-	json.NewEncoder(w).Encode(feed)
+	err = json.NewEncoder(w).Encode(feed)
+	if err != nil {
+		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
+		log.Printf("Failed to encode response: %v", err)
+	}
 }

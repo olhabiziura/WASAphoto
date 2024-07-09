@@ -82,8 +82,8 @@ func run() error {
 
 	// Start Database
 	logger.Println("initializing database support")
-	dbconn, err := sql.Open("sqlite3", "./wasaphoto.db") //cfg.DB.Filename)
-	fmt.Println("dqatabase yay")
+	dbconn, err := sql.Open("sqlite3", cfg.DB.Filename)
+
 	if err != nil {
 		logger.WithError(err).Error("error opening SQLite DB")
 		return fmt.Errorf("opening SQLite: %w", err)

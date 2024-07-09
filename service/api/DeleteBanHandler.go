@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-
+	"log"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -28,5 +28,9 @@ func (rt *_router) DeleteBan(w http.ResponseWriter, r *http.Request, ps httprout
 
 	w.WriteHeader(http.StatusOK)
 	response := map[string]string{"message": "User unbanned successfully"}
-	json.NewEncoder(w).Encode(response)
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
+		log.Printf("Failed to encode response: %v", err)
+	}
 }

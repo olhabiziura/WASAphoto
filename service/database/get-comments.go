@@ -1,14 +1,13 @@
 package database
 
 import (
-
-	"wasaphoto/service/api/models"
 	"fmt"
+	"wasaphoto/service/api/models"
 )
 
 func (db *appdbimpl) GetComments(pictureID string) ([]models.Comment, error) {
 	var comments []models.Comment
-	fmt.Println("jonljnl")
+
 	rows, err := db.c.Query("SELECT ownerID, text FROM comments WHERE pictureID=?", pictureID)
 	if err != nil {
 		fmt.Println(err)
@@ -21,7 +20,6 @@ func (db *appdbimpl) GetComments(pictureID string) ([]models.Comment, error) {
 		var ownerID string
 		var content string
 
-
 		err := rows.Scan(&ownerID, &content)
 		if err != nil {
 			return nil, err
@@ -30,7 +28,6 @@ func (db *appdbimpl) GetComments(pictureID string) ([]models.Comment, error) {
 		// Populate Comment struct
 		comment.OwnerID = ownerID
 		comment.Content = content
-
 
 		// Append to comments slice
 		comments = append(comments, comment)

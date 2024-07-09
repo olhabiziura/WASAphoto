@@ -41,8 +41,8 @@ func (rt *_router) Login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusOK) // 200 status code
 	response := map[string]string{
 		"message":  "User logged in successfully",
-		"user_id": strconv.FormatInt(userID, 10), // Convert userID to string
-		"username": user.Username, // Assuming Username is already a string
+		"user_id":  strconv.FormatInt(userID, 10), // Convert userID to string
+		"username": user.Username,                 // Assuming Username is already a string
 	}
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {

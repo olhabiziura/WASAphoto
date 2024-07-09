@@ -5,8 +5,8 @@ import (
 )
 
 type Comment struct {
-	OwnerID   string      `json:"ownerID"` 
-	Content   string    `json:"text"`
-	Date      time.Time `json:"date"`
-	//OwnerUsername string `json:"ownerID"` 
+	OwnerID string    `json:"ownerID"`
+	Content string    `json:"text"`
+	Date    time.Time `json:"date"`
+	//OwnerUsername string `json:"ownerID"`
 }

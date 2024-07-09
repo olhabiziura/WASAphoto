@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-
+	"log"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -25,7 +25,11 @@ func (rt *_router) DeleteFollowUser(w http.ResponseWriter, r *http.Request, ps h
 		if err.Error() == "not following" {
 			w.WriteHeader(http.StatusCreated)
 			response := map[string]string{"message": "User wasn't following the provided user"}
-			json.NewEncoder(w).Encode(response)
+			err = json.NewEncoder(w).Encode(response)
+			if err != nil {
+				http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
+				log.Printf("Failed to encode response: %v", err)
+			}
 			return
 		}
 		http.Error(w, "Failed to unfollow user", http.StatusInternalServerError)

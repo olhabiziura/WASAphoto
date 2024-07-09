@@ -2,14 +2,12 @@ package database
 
 import "time"
 
-
-
 type User struct {
-	ID        int  `json:"user_id"`
-	Username  string  `json:"username"`
-	FollowerList []User  `json:"followerList"`
-	FollowingList []User  `json:"followingList"`
-	BannedList    []User  `json:"bannedList"`
+	ID            int       `json:"user_id"`
+	Username      string    `json:"username"`
+	FollowerList  []User    `json:"followerList"`
+	FollowingList []User    `json:"followingList"`
+	BannedList    []User    `json:"bannedList"`
 	PhotoList     []Picture `json:"photoList"`
 }
 

@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-
+	"log"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -14,7 +14,7 @@ func (rt *_router) AddFollowUser(w http.ResponseWriter, r *http.Request, ps http
 		http.Error(w, "Missing authorization header", http.StatusBadRequest)
 		return
 	}
-	
+
 	// Extract FollowingID from path parameter
 	FollowingID := ps.ByName("userID")
 	if FollowingID == "" {
@@ -30,6 +30,10 @@ func (rt *_router) AddFollowUser(w http.ResponseWriter, r *http.Request, ps http
 			w.WriteHeader(http.StatusCreated)
 			response := map[string]string{"message": "User is already being followed"}
 			json.NewEncoder(w).Encode(response)
+			if err != nil {
+				http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
+				log.Printf("Failed to encode response: %v", err)
+			}
 		case "user not found":
 			http.Error(w, "Target user does not exist", http.StatusBadRequest)
 		default:

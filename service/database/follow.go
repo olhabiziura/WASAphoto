@@ -1,16 +1,13 @@
 package database
 
 import (
-	
 	"errors"
-	"fmt"
 )
 
 var ErrAlreadyFollowed = errors.New("already followed")
 
 // AddFollower inserts a follower relationship into the database.
 func (db *appdbimpl) AddFollower(followerID, followingID string) error {
-	fmt.Println(followerID, followingID)
 
 	// Check if the user is already being followed
 	var exists bool
@@ -32,14 +29,10 @@ func (db *appdbimpl) AddFollower(followerID, followingID string) error {
 	return nil
 }
 
-
-
-
 var ErrNotFollowing = errors.New("not following")
 
 // DeleteFollower removes a follower relationship from the database.
 func (db *appdbimpl) DeleteFollower(followerID, followingID string) error {
-	fmt.Println(followerID, followingID)
 
 	// Check if the user is currently following
 	var exists bool

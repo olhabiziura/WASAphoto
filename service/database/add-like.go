@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"errors"
-	
 )
 
 // AddLike inserts a like into the database if it doesn't already exist.

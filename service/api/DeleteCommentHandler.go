@@ -2,9 +2,9 @@ package api
 
 import (
 	"encoding/json"
-	"net/http"
 	"github.com/julienschmidt/httprouter"
-
+	"net/http"
+	"log"
 )
 
 func (rt *_router) DeleteComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -47,5 +47,9 @@ func (rt *_router) DeleteComment(w http.ResponseWriter, r *http.Request, ps http
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	response := map[string]string{"message": "Comment deleted successfully"}
-	json.NewEncoder(w).Encode(response)
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
+		log.Printf("Failed to encode response: %v", err)
+	}
 }

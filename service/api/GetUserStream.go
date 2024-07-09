@@ -2,9 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"wasaphoto/service/api/models"
-	"github.com/julienschmidt/httprouter"
+		"log"
 )
 
 func (rt *_router) GetUserStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -37,7 +38,7 @@ func (rt *_router) GetUserStream(w http.ResponseWriter, r *http.Request, ps http
 			userStream = append(userStream, feed[i])
 		}
 	}
-	
+
 	// Fetch and encode pictures
 	for i, picture := range userStream {
 
@@ -51,5 +52,9 @@ func (rt *_router) GetUserStream(w http.ResponseWriter, r *http.Request, ps http
 
 	// Send response with user stream
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(userStream)
+	err = json.NewEncoder(w).Encode(userStream)
+	if err != nil {
+		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
+		log.Printf("Failed to encode response: %v", err)
+	}
 }

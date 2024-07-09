@@ -2,10 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"wasaphoto/service/api/models"
-	"github.com/julienschmidt/httprouter"
-	"fmt"
+	"log"
 )
 
 func (rt *_router) GetProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -52,15 +52,13 @@ func (rt *_router) GetProfile(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 	profile.FollowingList = followingList
 
-	
 	banList, err := rt.db.GetBan(ProfileID)
-	fmt.Println(err)
+
 	if err != nil {
 		http.Error(w, "Failed to retrieve ban list", http.StatusInternalServerError)
 		return
 	}
 	profile.BanList = banList
-	
 
 	// Get feed for the profile
 	feed, err := rt.db.GetFeed(ProfileID)
@@ -68,7 +66,6 @@ func (rt *_router) GetProfile(w http.ResponseWriter, r *http.Request, ps httprou
 		http.Error(w, "Failed to retrieve feed", http.StatusInternalServerError)
 		return
 	}
-	
 
 	for i, picture := range feed {
 
@@ -84,7 +81,10 @@ func (rt *_router) GetProfile(w http.ResponseWriter, r *http.Request, ps httprou
 
 	// Encode profile instance in the response and send it back
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(profile)
+	err = json.NewEncoder(w).Encode(profile)
+	if err != nil {
+		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
+		log.Printf("Failed to encode response: %v", err)
+	}
 
-	
 }

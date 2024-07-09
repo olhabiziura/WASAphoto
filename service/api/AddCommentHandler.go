@@ -2,9 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"wasaphoto/service/api/models"
-	"github.com/julienschmidt/httprouter"
+	"log"
 )
 
 // AddCommentHandler handles adding comments using the net/http package
@@ -54,5 +55,9 @@ func (rt *_router) AddComment(w http.ResponseWriter, r *http.Request, ps httprou
 		"message": "Comment added successfully",
 		"comment": comment,
 	}
-	json.NewEncoder(w).Encode(response)
+	err:= json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
+		log.Printf("Failed to encode response: %v", err)
+	}
 }

@@ -2,8 +2,9 @@ package api
 
 import (
 	"encoding/json"
-	"net/http"
 	"github.com/julienschmidt/httprouter"
+	"net/http"
+		"log"
 )
 
 func (rt *_router) SearchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -21,5 +22,9 @@ func (rt *_router) SearchUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
+	err = json.NewEncoder(w).Encode(users)
+	if err != nil {
+		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
+		log.Printf("Failed to encode response: %v", err)
+	}
 }

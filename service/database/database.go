@@ -31,78 +31,133 @@ Then you can initialize the AppDatabase and pass it to the api package.
 package database
 
 import (
-    "database/sql"
-    "errors"
-    "fmt"
-    "time"
-    "wasaphoto/service/api/models"
+	"database/sql"
+	"errors"
+	"fmt"
+	"time"
+	"wasaphoto/service/api/models"
+	
 )
 
 // AppDatabase is the high-level interface for the DB
 type AppDatabase interface {
-    AddPhoto(ownerID, address string, date time.Time, description string) (int64, error)
-    DeletePhoto(userID, photoID string) (string, error)
+	AddPhoto(ownerID, address string, date time.Time, description string) (int64, error)
+	DeletePhoto(userID, photoID string) (string, error)
 
-    AddComment(userID, pictureID, content string) error
-    DeleteComment(userID, pictureID, commentID string) error
-    GetComments(pictureID string) ([]models.Comment, error)
+	AddComment(userID, pictureID, content string) error
+	DeleteComment(userID, pictureID, commentID string) error
+	GetComments(pictureID string) ([]models.Comment, error)
 
-    AddLike(userID, pictureID string) error
-    DeleteLike(userID, pictureID string) error
-    GetLikes(pictureID string) ([]string, error)
+	AddLike(userID, pictureID string) error
+	DeleteLike(userID, pictureID string) error
+	GetLikes(pictureID string) ([]string, error)
 
-    AddBan(userID, bannedID string) error
-    DeleteBan(userID, bannedID string) error
-    GetBan(userID string) ([]string, error)
-    GetIfBan(userID, bannerID string) (bool, error) 
+	AddBan(userID, bannedID string) error
+	DeleteBan(userID, bannedID string) error
+	GetBan(userID string) ([]string, error)
+	GetIfBan(userID, bannerID string) (bool, error)
 
-    AddFollower(followerID, followingID string) error
-    DeleteFollower(followerID, followingID string) error
-    GetFollowers(userID string) ([]models.User, error)
-    GetFollowing(userID string) ([]models.User, error)
+	AddFollower(followerID, followingID string) error
+	DeleteFollower(followerID, followingID string) error
+	GetFollowers(userID string) ([]models.User, error)
+	GetFollowing(userID string) ([]models.User, error)
 
-    AddUser(username string) (int64, error)
-    Login(username string) (int64, error)
-    SetUsername(userID, username string) error
-    GetUsername(userID string) (string, error)
-    GetFeed(userID string) ([]models.Picture, error)
-    GetUsers(usernamePrefix string) ([]models.User, error)
+	AddUser(username string) (int64, error)
+	Login(username string) (int64, error)
+	SetUsername(userID, username string) error
+	GetUsername(userID string) (string, error)
+	GetFeed(userID string) ([]models.Picture, error)
+	GetUsers(usernamePrefix string) ([]models.User, error)
 
-    Ping() error
-    GetDB() *sql.DB
+	Ping() error
+	GetDB() *sql.DB
 }
 
 type appdbimpl struct {
-    c *sql.DB
+	c *sql.DB
 }
 
 // New returns a new instance of AppDatabase based on the SQLite connection `db`.
 // `db` is required - an error will be returned if `db` is `nil`.
 func New(db *sql.DB) (AppDatabase, error) {
-    if db == nil {
-        return nil, errors.New("database is required when building an AppDatabase")
-    }
+	if db == nil {
+		return nil, errors.New("database is required when building an AppDatabase")
+	}
 
-    // Check if table exists. If not, the database is empty, and we need to create the structure
-    var tableName string
-    err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
-    if errors.Is(err, sql.ErrNoRows) {
-        sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
-        _, err = db.Exec(sqlStmt)
-        if err != nil {
-            return nil, fmt.Errorf("error creating database structure: %w", err)
-        }
-    }
+	// Check if table exists. If not, the database is empty, and we need to create the structure
+	var tableName string
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
+	if errors.Is(err, sql.ErrNoRows) {
+		err = createDatabase(db)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
 
-    return &appdbimpl{
-        c: db,
-    }, nil
+	return &appdbimpl{
+		c: db,
+	}, nil
 }
 
+
 func (db *appdbimpl) Ping() error {
-    return db.c.Ping()
+	return db.c.Ping()
 }
 
 func (db *appdbimpl) GetDB() *sql.DB {
-    return db.c
+	return db.c
+}
+
+func createDatabase(db *sql.DB) error {
+	tables := []string{
+		`CREATE TABLE IF NOT EXISTS ban (
+			userID INTEGER NOT NULL,
+			banID INTEGER NOT NULL,
+			PRIMARY KEY(userID, banID)
+		);`,
+
+		`CREATE TABLE IF NOT EXISTS comments (
+			commentID INTEGER UNIQUE,
+			pictureID INTEGER NOT NULL,
+			text TEXT NOT NULL,
+			ownerID INTEGER NOT NULL,
+			PRIMARY KEY(commentID AUTOINCREMENT)
+		);`,
+
+		`CREATE TABLE IF NOT EXISTS followers (
+			FollowerID INTEGER NOT NULL,
+			FollowingID INTEGER NOT NULL,
+			PRIMARY KEY(FollowerID, FollowingID)
+		);`,
+
+		`CREATE TABLE IF NOT EXISTS likes (
+			userID INTEGER NOT NULL,
+			pictureID INTEGER NOT NULL,
+			PRIMARY KEY(pictureID, userID)
+		);`,
+
+		`CREATE TABLE IF NOT EXISTS pictures (
+			ownerID INTEGER NOT NULL,
+			pictureID INTEGER NOT NULL UNIQUE,
+			address TEXT,
+			date TEXT,
+			description TEXT,
+			PRIMARY KEY(pictureID AUTOINCREMENT)
+		);`,
+
+		`CREATE TABLE IF NOT EXISTS users (
+			userID INTEGER NOT NULL UNIQUE,
+			username TEXT NOT NULL UNIQUE,
+			PRIMARY KEY(userID)
+		);`,
+	}
+
+	for _, sqlStmt := range tables {
+		_, err := db.Exec(sqlStmt)
+		if err != nil {
+			return fmt.Errorf("error executing statement: %v\n%v", err, sqlStmt)
+		}
+	}
+
+	return nil
 }

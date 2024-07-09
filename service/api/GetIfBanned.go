@@ -3,9 +3,8 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-
+	"log"
 	"github.com/julienschmidt/httprouter"
-	
 )
 
 func (rt *_router) GetIfBanned(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -32,5 +31,9 @@ func (rt *_router) GetIfBanned(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Set Content-Type header and encode the response as JSON
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]bool{"isBanned": IsBanned})
+	err = json.NewEncoder(w).Encode(map[string]bool{"isBanned": IsBanned})
+	if err != nil {
+		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
+		log.Printf("Failed to encode response: %v", err)
+	}
 }

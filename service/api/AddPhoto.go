@@ -3,17 +3,16 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/julienschmidt/httprouter"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 	"wasaphoto/service/api/models"
-	"github.com/julienschmidt/httprouter"
-	"strconv"
-
+	"log"
 )
-
 
 func (rt *_router) AddPhotoHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var picture models.Picture
@@ -73,7 +72,7 @@ func (rt *_router) AddPhotoHandler(w http.ResponseWriter, r *http.Request, ps ht
 	picture.Address = filePath
 
 	var username string
-	username,err = rt.db.GetUsername(userID)
+	username, err = rt.db.GetUsername(userID)
 	picture.Username = username
 
 	encodedImage, err := ReadImageAsBase64(picture.Address)
@@ -87,5 +86,9 @@ func (rt *_router) AddPhotoHandler(w http.ResponseWriter, r *http.Request, ps ht
 	// Send success response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(picture)
+	err = json.NewEncoder(w).Encode(picture)
+	if err != nil {
+		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
