@@ -14,13 +14,13 @@ func (db *appdbimpl) DeletePhoto(userID, photoID string) (string, error) {
 		if err == sql.ErrNoRows {
 			return "", fmt.Errorf("photo not found")
 		}
-		return "", fmt.Errorf("error retrieving photo: %v", err)
+		return "", fmt.Errorf("error retrieving photo: %w", err)
 	}
 
 	// Execute delete query
 	_, err = db.GetDB().Exec("DELETE FROM pictures WHERE ownerID = ? AND pictureID = ?", userID, photoID)
 	if err != nil {
-		return "", fmt.Errorf("error deleting photo: %v", err)
+		return "", fmt.Errorf("error deleting photo: %w", err)
 	}
 
 	return filePath, nil

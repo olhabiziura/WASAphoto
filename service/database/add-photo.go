@@ -15,13 +15,13 @@ func (db *appdbimpl) AddPhoto(ownerID, address string, date time.Time, descripti
 
 	result, err := db.GetDB().Exec(query, ownerID, address, date, description)
 	if err != nil {
-		return 0, fmt.Errorf("error inserting photo record: %v", err)
+		return 0, fmt.Errorf("error inserting photo record: %w", err)
 	}
 
 	// For SQL databases that support LastInsertId (e.g., SQLite, MySQL)
 	pictureID, err = result.LastInsertId()
 	if err != nil {
-		return 0, fmt.Errorf("error retrieving last insert ID: %v", err)
+		return 0, fmt.Errorf("error retrieving last insert ID: %w", err)
 	}
 
 	return pictureID, nil

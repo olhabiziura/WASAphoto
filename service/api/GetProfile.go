@@ -84,7 +84,7 @@ func (rt *_router) GetProfile(w http.ResponseWriter, r *http.Request, ps httprou
 	err = json.NewEncoder(w).Encode(profile)
 	if err != nil {
 		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
-		log.Printf("Failed to encode response: %v", err)
+		log.Printf("Failed to encode response: %w", err)
 	}
 
 }

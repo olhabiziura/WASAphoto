@@ -34,6 +34,6 @@ func (rt *_router) GetIfBanned(w http.ResponseWriter, r *http.Request, ps httpro
 	err = json.NewEncoder(w).Encode(map[string]bool{"isBanned": IsBanned})
 	if err != nil {
 		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
-		log.Printf("Failed to encode response: %v", err)
+		log.Printf("Failed to encode response: %w", err)
 	}
 }

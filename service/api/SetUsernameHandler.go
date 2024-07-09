@@ -23,7 +23,7 @@ func (rt *_router) SetUsernameHandler(w http.ResponseWriter, r *http.Request, ps
 	}
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&newUsername); err != nil {
-		http.Error(w, fmt.Sprintf("Failed to parse request body: %v", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Failed to parse request body: %w", err), http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
@@ -34,7 +34,7 @@ func (rt *_router) SetUsernameHandler(w http.ResponseWriter, r *http.Request, ps
 		if err.Error() == fmt.Sprintf("username %s is already taken", newUsername.Username) {
 			http.Error(w, fmt.Sprintf("Username %s is already taken", newUsername.Username), http.StatusBadRequest)
 		} else {
-			http.Error(w, fmt.Sprintf("Failed to change username: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Failed to change username: %w", err), http.StatusInternalServerError)
 		}
 		return
 	}

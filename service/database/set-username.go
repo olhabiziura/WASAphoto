@@ -11,7 +11,7 @@ func (db *appdbimpl) SetUsername(userID, newUsername string) error {
 	var existingUserID int64
 	err := db.GetDB().QueryRow("SELECT userID FROM users WHERE username = ? LIMIT 1", newUsername).Scan(&existingUserID)
 	if err != nil && err != sql.ErrNoRows {
-		return fmt.Errorf("error checking existing username: %v", err)
+		return fmt.Errorf("error checking existing username: %w", err)
 	}
 	if existingUserID != 0 {
 		return fmt.Errorf("username %s is already taken", newUsername)
@@ -21,7 +21,7 @@ func (db *appdbimpl) SetUsername(userID, newUsername string) error {
 	_, err = db.GetDB().Exec("UPDATE users SET username = ? WHERE userID = ?", newUsername, userID)
 
 	if err != nil {
-		return fmt.Errorf("error updating username: %v", err)
+		return fmt.Errorf("error updating username: %w", err)
 	}
 
 	return nil

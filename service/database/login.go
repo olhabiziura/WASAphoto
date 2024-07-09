@@ -16,11 +16,11 @@ func (db *appdbimpl) Login(username string) (int64, error) {
 		// User does not exist, so add the user
 		userID, err = db.AddUser(username)
 		if err != nil {
-			return 0, fmt.Errorf("failed to add user: %v", err)
+			return 0, fmt.Errorf("failed to add user: %w", err)
 		}
 	} else if err != nil {
 		// Other error occurred during query execution
-		return 0, fmt.Errorf("failed to retrieve user: %v", err)
+		return 0, fmt.Errorf("failed to retrieve user: %w", err)
 	}
 
 	return userID, nil

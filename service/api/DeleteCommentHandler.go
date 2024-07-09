@@ -50,6 +50,6 @@ func (rt *_router) DeleteComment(w http.ResponseWriter, r *http.Request, ps http
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
-		log.Printf("Failed to encode response: %v", err)
+		log.Printf("Failed to encode response: %w", err)
 	}
 }

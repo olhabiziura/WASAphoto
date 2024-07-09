@@ -12,7 +12,7 @@ func (db *appdbimpl) GetFeed(userID string) ([]models.Picture, error) {
 
 	rows, err := db.c.Query("SELECT pictureID, ownerID, date, address FROM pictures WHERE ownerID=?", userID)
 	if err != nil {
-		log.Printf("Failed to execute query: %v", err)
+		log.Printf("Failed to execute query: %w", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -27,14 +27,14 @@ func (db *appdbimpl) GetFeed(userID string) ([]models.Picture, error) {
 
 		err := rows.Scan(&pictureID, &ownerID, &date, &address)
 		if err != nil {
-			log.Printf("Failed to scan row: %v", err)
+			log.Printf("Failed to scan row: %w", err)
 			return nil, err
 		}
 
 		// Parse the date string into a time.Time variable
 		parsedDate, err := time.Parse("2006-01-02 15:04:05.999999999-07:00", date) // Adjust the layout according to your date format
 		if err != nil {
-			log.Printf("Failed to parse date: %v", err)
+			log.Printf("Failed to parse date: %w", err)
 			return nil, err
 		}
 
@@ -46,7 +46,7 @@ func (db *appdbimpl) GetFeed(userID string) ([]models.Picture, error) {
 
 		username, err := db.GetUsername(strconv.Itoa(ownerID))
 		if err != nil {
-			log.Printf("Failed to get username: %v", err)
+			log.Printf("Failed to get username: %w", err)
 			return nil, err
 		}
 		pic.Username = username
@@ -54,14 +54,14 @@ func (db *appdbimpl) GetFeed(userID string) ([]models.Picture, error) {
 		// Call GetLikes to fetch the list of users who liked this picture
 		pic.Likes, err = db.GetLikes(pic.PictureID)
 		if err != nil {
-			log.Printf("Failed to get likes: %v", err)
+			log.Printf("Failed to get likes: %w", err)
 			return nil, err
 		}
 
 		// Call GetComments to fetch comments for this picture
 		pic.Comments, err = db.GetComments(pic.PictureID)
 		if err != nil {
-			log.Printf("Failed to get comments: %v", err)
+			log.Printf("Failed to get comments: %w", err)
 			return nil, err
 		}
 
@@ -69,7 +69,7 @@ func (db *appdbimpl) GetFeed(userID string) ([]models.Picture, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Printf("Rows iteration error: %v", err)
+		log.Printf("Rows iteration error: %w", err)
 		return nil, err
 	}
 
