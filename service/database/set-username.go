@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"errors"
 )
 
 // SetUsername updates the username of a user identified by userID to a new username.
@@ -10,8 +11,10 @@ func (db *appdbimpl) SetUsername(userID, newUsername string) error {
 	// Check if the new username is already taken
 	var existingUserID int64
 	err := db.GetDB().QueryRow("SELECT userID FROM users WHERE username = ? LIMIT 1", newUsername).Scan(&existingUserID)
-	if err != nil && err != sql.ErrNoRows {
-		return fmt.Errorf("error checking existing username: %w", err)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("error checking existing username: %w", err)
+		}
 	}
 	if existingUserID != 0 {
 		return fmt.Errorf("username %s is already taken", newUsername)
