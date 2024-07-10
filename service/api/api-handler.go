@@ -22,7 +22,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/like/:pictureID", rt.DeleteLike)
 
 	rt.router.POST("/follow/:userID", rt.AddFollowUser)
-	rt.router.DELETE("/unfollow/:userID", rt.DeleteFollowUser)
+	rt.router.DELETE("/follow/:userID", rt.DeleteFollowUser)
 
 	rt.router.POST("/ban/:userID", rt.AddBan)
 	rt.router.DELETE("/ban/:userID", rt.DeleteBan)
