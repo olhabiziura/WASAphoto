@@ -10,7 +10,7 @@ func (db *appdbimpl) GetComments(pictureID string) ([]models.Comment, error) {
 
 	rows, err := db.c.Query("SELECT commentID, ownerID, text FROM comments WHERE pictureID=?", pictureID)
 	if err != nil {
-		fmt.Println(err)
+
 		return nil, err
 	}
 	defer rows.Close()

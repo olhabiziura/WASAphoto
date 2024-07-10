@@ -153,9 +153,8 @@ func createDatabase(db *sql.DB) error {
 	for _, sqlStmt := range tables {
 		_, err := db.Exec(sqlStmt)
 		if err != nil {
-			return fmt.Errorf("error executing statement: %v\n%v", err, sqlStmt)
+			return fmt.Errorf("error executing statement: %w\nSQL: %v", err, sqlStmt)
 		}
 	}
-
 	return nil
 }
