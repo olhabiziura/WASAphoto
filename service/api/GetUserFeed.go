@@ -5,9 +5,8 @@ import (
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"io/ioutil"
-	"net/http"
 	"log"
-	
+	"net/http"
 )
 
 // ReadImageAsBase64 reads an image from the file path and returns it as a base64 encoded string

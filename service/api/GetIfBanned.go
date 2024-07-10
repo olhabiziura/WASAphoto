@@ -2,9 +2,9 @@ package api
 
 import (
 	"encoding/json"
-	"net/http"
-	"log"
 	"github.com/julienschmidt/httprouter"
+	"log"
+	"net/http"
 )
 
 func (rt *_router) GetIfBanned(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

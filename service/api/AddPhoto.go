@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"time"
 	"wasaphoto/service/api/models"
-	"log"
 )
 
 func (rt *_router) AddPhotoHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -27,14 +27,14 @@ func (rt *_router) AddPhotoHandler(w http.ResponseWriter, r *http.Request, ps ht
 	// Parse multipart form to get file and description
 	err := r.ParseMultipartForm(10 << 20) // maxMemory 10MB
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to parse multipart form: %w", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Failed to parse multipart form: %v", err), http.StatusBadRequest)
 		return
 	}
 
 	// Get file from form
 	file, handler, err := r.FormFile("picture")
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to get file from form: %w", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Failed to get file from form: %v", err), http.StatusBadRequest)
 		return
 	}
 	defer file.Close()
@@ -44,14 +44,14 @@ func (rt *_router) AddPhotoHandler(w http.ResponseWriter, r *http.Request, ps ht
 	filePath := filepath.Join("cmd/photos", fileName)
 	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to create file: %w", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Failed to create file: %v", err), http.StatusInternalServerError)
 		return
 	}
 	defer f.Close()
 
 	_, err = io.Copy(f, file)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to save file: %w", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Failed to save file: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -61,7 +61,7 @@ func (rt *_router) AddPhotoHandler(w http.ResponseWriter, r *http.Request, ps ht
 	// Call database function to add photo record
 	pictureID, err := rt.db.AddPhoto(userID, filePath, time.Now(), description)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to add photo record: %w", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Failed to add photo record: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -89,6 +89,6 @@ func (rt *_router) AddPhotoHandler(w http.ResponseWriter, r *http.Request, ps ht
 	err = json.NewEncoder(w).Encode(picture)
 	if err != nil {
 		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
-		log.Printf("Failed to encode response: %w", err)
+		log.Printf("Failed to encode response: %v", err)
 	}
 }

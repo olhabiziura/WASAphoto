@@ -30,29 +30,38 @@ export default {
             // /profiles/:username
 			this.$router.push(`/profile/${this.username}`);
 		},
-		async likeToggle() {
-			try {
-				if (!this.liked) {
-					// PUT /like/{id}
-                    console.log(this.pid)
-                    await this.$axios.post(`/like/${this.pid}`, null, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
-					this.likes.push({user_id: sessionStorage.getItem('token'), username: sessionStorage.getItem('username')});
-				} else {
-					// DELETE /like/{id}
-                    await this.$axios.delete(`/like/${this.pid}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
-                    this.likes = this.likes.filter(user_id => user_id != sessionStorage.getItem('token'));
-				}
-				this.liked = !this.liked;
-			} catch (error) {
+        async likeToggle() {
+            try {
+                console.log(this.likes);
+                const userId = sessionStorage.getItem('token');
+
+                if (!this.liked) {
+                    // PUT /like/{id}
+                    await this.$axios.post(`/like/${this.pid}`, null, {
+                        headers: { 'Authorization': `${userId}` }
+                    });
+                    if (!this.likes.some(like => like.userId === userId)) {
+                        this.likes.push({ userId });
+                    }
+                } else {
+                    // DELETE /like/{id}
+                    await this.$axios.delete(`/like/${this.pid}`, {
+                        headers: { 'Authorization': `${userId}` }
+                    });
+                    this.likes = this.likes.filter(like => like.userId !== userId);
+                }
+
+                this.liked = !this.liked;
+            } catch (error) {
                 const status = error.response.status;
-        		const reason = error.response.data;
+                const reason = error.response.data;
                 this.errormsg = 'Status ' + status + ': ' + reason;
                 alert(this.errormsg);
             }
-    	},
+        },
         // on child event
 		removeCommentFromList(comment_id) {
-			this.comments = this.comments.filter(comment => comment.comment_id != comment_id);
+			this.comments = this.comments.filter(comment => comment.CommentID != comment_id);
 		},
 		addCommentToList(comment){
 			this.comments.unshift(comment); // at the beginning of the list
@@ -69,7 +78,7 @@ export default {
 	async mounted() {
         // Set the photo URL to the base64 encoded image from props
         this.photoURL = `data:image/jpeg;base64,${this.image}`;
-        
+
         if (this.likesListParent != null) {
             this.likes = this.likesListParent;
         }

@@ -36,7 +36,6 @@ import (
 	"fmt"
 	"time"
 	"wasaphoto/service/api/models"
-	
 )
 
 // AppDatabase is the high-level interface for the DB
@@ -44,7 +43,7 @@ type AppDatabase interface {
 	AddPhoto(ownerID, address string, date time.Time, description string) (int64, error)
 	DeletePhoto(userID, photoID string) (string, error)
 
-	AddComment(userID, pictureID, content string) error
+	AddComment(userID, pictureID, content string) (string, error)
 	DeleteComment(userID, pictureID, commentID string) error
 	GetComments(pictureID string) ([]models.Comment, error)
 
@@ -98,7 +97,6 @@ func New(db *sql.DB) (AppDatabase, error) {
 		c: db,
 	}, nil
 }
-
 
 func (db *appdbimpl) Ping() error {
 	return db.c.Ping()

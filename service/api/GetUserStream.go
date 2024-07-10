@@ -3,9 +3,9 @@ package api
 import (
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
+	"log"
 	"net/http"
 	"wasaphoto/service/api/models"
-		"log"
 )
 
 func (rt *_router) GetUserStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

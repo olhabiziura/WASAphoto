@@ -3,8 +3,8 @@ package api
 import (
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
+	"log"
 	"net/http"
-		"log"
 )
 
 func (rt *_router) SearchUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

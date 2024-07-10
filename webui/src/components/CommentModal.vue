@@ -23,7 +23,8 @@ export default {
                 });                
                 let comment = response.data["comment"];
                 this.$emit('addComment', comment); // signal to parent
-                console.log("new comment:" ,this.comments);
+                console.log("new comment:" ,comment );
+                
                 this.text = "";
             } catch(error) {
                 const status = error.response.status;
@@ -35,7 +36,7 @@ export default {
         async uncommentPhoto(comment_id) {
             try {
                 // DELETE /photo/{pid}/comment/{comment_id}
-                await this.$axios.delete(`/deletecomment/${this.pid}/comment/${comment_id}/`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
+                await this.$axios.delete(`/deletecomment/${this.pid}/comment/${comment_id}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
                 this.$emit('removeComment', comment_id); // signal to parent
             } catch(error) {
                 const status = error.response.status;
@@ -80,14 +81,14 @@ export default {
                     </div>
                 </div>
                 <div class="modal-body" style="overflow-y: auto;">
-                    <div v-for="comment in comments" :key="comment.comment_id" class="comment-container">
+                    <div v-for="comment in comments" :key="comment.commentID" class="comment-container">
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-10">
                                     <h5>@<b>{{comment.ownerID}}</b></h5>
                                 </div>
                                 <div class="col-2">
-                                    <button v-if="token == comment.user_id || isOwner" class="btn my-btn-comm" @click="uncommentPhoto(comment.comment_id)">
+                                    <button v-if="token == comment.user_id || isOwner" class="btn my-btn-comm" @click="uncommentPhoto(comment.CommentID)">
                                         <i class="fa-regular fa-trash-can my-trash-icon"></i>
                                     </button>
                                 </div>
@@ -95,7 +96,7 @@ export default {
                             <div class="row">
                                 <div class="col-12">
                                    <h4>{{comment.text}}</h4> 
-                                   {{ comment.date }}
+                                
                                 </div>
                             </div>
                             

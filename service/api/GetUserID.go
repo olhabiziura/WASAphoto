@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
+	"log"
 	"net/http"
 	"strconv"
 	"wasaphoto/service/api/models"
-		"log"
 )
 
 func (rt *_router) AddUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

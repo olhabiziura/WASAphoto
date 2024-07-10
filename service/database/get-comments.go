@@ -8,7 +8,7 @@ import (
 func (db *appdbimpl) GetComments(pictureID string) ([]models.Comment, error) {
 	var comments []models.Comment
 
-	rows, err := db.c.Query("SELECT ownerID, text FROM comments WHERE pictureID=?", pictureID)
+	rows, err := db.c.Query("SELECT commentID, ownerID, text FROM comments WHERE pictureID=?", pictureID)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -19,16 +19,15 @@ func (db *appdbimpl) GetComments(pictureID string) ([]models.Comment, error) {
 		var comment models.Comment
 		var ownerID string
 		var content string
-
-		err := rows.Scan(&ownerID, &content)
+		var commentID string
+		err := rows.Scan(&commentID, &ownerID, &content)
 		if err != nil {
 			return nil, err
 		}
-
 		// Populate Comment struct
 		comment.OwnerID = ownerID
 		comment.Content = content
-
+		comment.CommentID = commentID
 		// Append to comments slice
 		comments = append(comments, comment)
 	}

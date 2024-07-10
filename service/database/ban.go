@@ -2,14 +2,12 @@ package database
 
 import (
 	"errors"
-	
 )
 
 var ErrAlreadyBanned = errors.New("already banned")
 
 // AddBan adds a user to the banned list in the database.
 func (db *appdbimpl) AddBan(UserID, BanID string) error {
-	
 
 	// Check if the user is already banned
 	var exists bool
@@ -32,7 +30,6 @@ func (db *appdbimpl) AddBan(UserID, BanID string) error {
 }
 
 func (db *appdbimpl) DeleteBan(UserID, BannedID string) error {
-
 
 	// Execute the SQL delete statement
 	_, err := db.GetDB().Exec("DELETE FROM ban WHERE userID = ? AND banID = ?", UserID, BannedID)

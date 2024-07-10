@@ -3,8 +3,8 @@ package api
 import (
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
-	"net/http"
 	"log"
+	"net/http"
 )
 
 func (rt *_router) DeleteComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -16,13 +16,13 @@ func (rt *_router) DeleteComment(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	// Extract PictureID and CommentID from URL parameters
-	PictureID := ps.ByName("PictureID")
+	PictureID := ps.ByName("pictureID")
 	if PictureID == "" {
 		http.Error(w, "Missing PictureID parameter", http.StatusBadRequest)
 		return
 	}
 
-	CommentID := ps.ByName("CommentID")
+	CommentID := ps.ByName("commentID")
 	if CommentID == "" {
 		http.Error(w, "Missing CommentID parameter", http.StatusBadRequest)
 		return
