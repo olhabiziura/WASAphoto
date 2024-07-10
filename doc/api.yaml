@@ -117,12 +117,14 @@ paths:
             application/json:
               schema:
                 type: object
+                description: Error response when username is already taken.
                 properties:
                   error:
                     type: string
                     minLength: 3
                     maxLength: 30
                     example: Username is already taken.
+                    description: Message indicating that the user is already being followed.
         '500':
           $ref: '#/components/responses/InternalServerError'
       security:
@@ -154,6 +156,7 @@ paths:
                   description: Description of the photo
                   minLength: 1
                   maxLength: 2200
+                  pattern: '^[\s\S]{1,2200}$'
       responses:
         '200':
           description: Photo uploaded and added successfully
@@ -180,13 +183,14 @@ paths:
           content:
             application/json:
               schema:
+                description: Response message.
                 type: object
                 properties:
                   photos:
                     type: array
                     minItems: 0
                     maxItems: 300
-                    
+                    description: an array of photos of user's feed.
                     items:
                       $ref: '#/components/schemas/picture'
         '400':
@@ -273,7 +277,7 @@ paths:
       tags: [comments]
       operationId: commentPhoto
       summary: Add a comment to a picture
-
+      description: Add a comment to the picture.
       parameters:
         - in: path
           name: picture_id
@@ -282,7 +286,6 @@ paths:
           schema:
             $ref: '#/components/schemas/picture_id'
       requestBody:
-
         content:
           application/json:
             schema:
@@ -294,12 +297,15 @@ paths:
                   example: "This is a comment."
                   minLength: 1  
                   maxLength: 2200  
+                  pattern: '^[\s\S]{1,2200}$'
+                  description: Comment text.
       responses:
         '201':
           description: Comment added successfully
           content:
             application/json:
               schema:
+                description: Response message.
                 type: object
                 properties:
                   message:
@@ -307,9 +313,13 @@ paths:
                     minLength: 3
                     maxLength: 30
                     example: Comment added successfully
+                    description: Message of successful addition.
                   comment:
                     type: object
+                    description: Comment details.
                     properties:
+                      username: 
+                        $ref: "#/components/schemas/username"
                       owner_id:
                         $ref: "#/components/schemas/user_id"
                       content:
@@ -317,6 +327,7 @@ paths:
                         minLength: 0
                         maxLength: 2200
                         example: "This is a comment."
+                        description: Description of the response message indicating that comment was added.
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -378,13 +389,16 @@ paths:
           content:
             application/json:
               schema:
+                
                 type: object
+                description: Message indicating that the user is already being followed.
                 properties:
                   message:
                     type: string
                     minLength: 3
                     maxLength: 30
                     example: User is already being followed.
+                    description: Message indicating that the user is already being followed.
         "400":
           $ref: '#/components/responses/BadRequest'
         "500":
@@ -410,13 +424,17 @@ paths:
           content:
             application/json:
               schema:
+                description: Response message.
                 type: object
                 properties:
+                  
                   message:
                     type: string
                     minLength: 3
                     maxLength: 30
-                    example: User was not following provided account..
+                    example: User wasn't following account.
+                    description: Description of the response message indicating user wasn't following an account.
+                    
         "400":
           $ref: '#/components/responses/BadRequest'
         "500":
@@ -446,6 +464,7 @@ paths:
           content:
             application/json:
               schema:
+                description: Response message.
                 type: object
                 properties:
                   message:
@@ -453,6 +472,7 @@ paths:
                     minLength: 3
                     maxLength: 30
                     example: User is already banned.
+                    description: Description of the response message indicating user was banned.
         "400":
           $ref: '#/components/responses/BadRequest'
         "500":
@@ -471,6 +491,7 @@ paths:
           content:
             application/json:
               schema:
+                description: Response message.
                 type: object
                 properties:
                   message:
@@ -478,16 +499,15 @@ paths:
                     minLength: 3
                     maxLength: 30
                     example: User wasn't banned.
+                    description: Description of the response message indicating user wasn't banned.
         "400":
           $ref: '#/components/responses/BadRequest'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-
-
-
-
     get:
+      operationId: amIBanned
+      tags: ["bans"]
       summary: Check if a user is banned
       description: Check if the user specified by the Authorization header is banned by the user specified in the path parameter.
       responses:
@@ -496,6 +516,7 @@ paths:
           content:
             application/json:
               schema:
+                description: Boolean answer.
                 type: object
                 properties:
                   isBanned:
@@ -516,6 +537,7 @@ paths:
       - in: path
         name: user_id
         required: true
+        description: Represents user id.
         schema:
           $ref: '#/components/schemas/user_id'
 
@@ -552,12 +574,13 @@ paths:
       description: |
         Retrieves a list of up to 5 pictures from each user that the authenticated user is following.
       responses:
-        '200':
+        '201':
           description: User stream retrieved successfully
           content:
             application/json:
               schema:
                 type: object
+                description: Successful response containing user stream information.
                 properties:
                   pictures:
                     description: a list of pictures.
@@ -579,7 +602,9 @@ paths:
   /search:
     
     get:
+      operationId: searchUser
       tags: [search]
+      description: A search fot users in database.
       summary: Search users by username prefix
       parameters:
         - in: query
@@ -594,6 +619,7 @@ paths:
             application/json:
               schema:
                 type: object
+                description: Represents a list of users that match a request.
                 properties:
                   users:       
                     type: array
@@ -621,6 +647,7 @@ components:
 ###################SCHEMAS####################
   schemas: 
     profile:
+      description: Represents a user profile.
       type: object
       properties:
         UserID:
@@ -638,35 +665,12 @@ components:
 
     user:
       type: object
+      description: Represents a user.
       properties:
         username:
           $ref: '#/components/schemas/username'
         
-          
-    user_id:
-      description: User's personal and unique id, or identification.
-      type: string
-      example: '13467'
-      minLength: 3
-      maxLength: 16
-
-    username:
-      title: username
-      description: Username of the user, must be unique.
-      type: string
-      pattern: '^.*?$'
-      example: JohnyDoe
-      minLength: 3
-      maxLength: 16
-      
-
-    binary_image:
-      description: Binary image.
-      type: string
-      format: binary
-      minLength: 4
-      maxLength: 65535
-      example: iVBORw0KGgoAAAANSU... 
+        
  
     user_feed:
       title: user_feed
@@ -698,6 +702,7 @@ components:
 
     picture:
       type: object
+      description: Represents a picture uploaded by a user.
       properties:
         PictureId:
           $ref: "#/components/schemas/picture_id"
@@ -707,24 +712,25 @@ components:
           $ref: "#/components/schemas/username"
         date:
           type: string
-          minLength: 0
+          minLength: 1  # minimum length should be 1 to ensure it's not empty
           maxLength: 60
           format: date-time
           description: Date and time of uploading the picture
-          example: '12023-12-04T13:06:00Z' 
+          example: '2023-12-04T13:06:00Z'
+          pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$'
         likes:
           type: array
           minItems: 0
           maxItems: 300
-          items: 
+          items:
             $ref: '#/components/schemas/user_id'
           description: People who liked the picture
         comments:
           type: array
           minItems: 0
           maxItems: 300
-          description: List of comments.
-          items: 
+          description: List of comments
+          items:
             $ref: '#/components/schemas/comment'
         image:
           $ref: '#/components/schemas/binary_image'
@@ -737,7 +743,36 @@ components:
       readOnly: true
       minLength: 1
       maxLength: 30
-    
+      pattern: '^.{1,30}$'  # Ensures at least 1 character and up to 30 characters
+
+    user_id:
+      title: user_id
+      description: "This object represents the id of the user"
+      type: string
+      example: "user_123"
+      minLength: 1
+      maxLength: 30
+      pattern: '^.{1,30}$'  # Ensures at least 1 character and up to 30 characters
+
+    username:
+      title: username
+      description: "Username of the user"
+      type: string
+      example: "john_doe"
+      minLength: 1
+      maxLength: 30
+      pattern: '^[a-zA-Z0-9_]{1,30}$'  # Allows alphanumeric characters and underscores, between 1 and 30 characters
+
+    binary_image:
+      title: binary_image
+      description: Binary representation of the image
+      type: string
+      format: byte
+      pattern: '^[a-zA-Z0-9+/]*={0,2}$'
+      minLength: 1  
+      maxLength: 1000000  
+      example: "SGVsbG8gV29ybGQh"  
+
     
  
     comment:
@@ -754,67 +789,78 @@ components:
     text:
       description: Comment text.
       type: string
-      pattern: '^.*?$'
+      pattern: '^.{1,2200}$' # Ensures at least 1 character and up to 2200 characters
       minLength: 1
       maxLength: 2200
       example: "Nice shot!"
-
     comment_id:
       title: comment_id
-      description: "represents the id of the comment"
+      description: "Represents the ID of the comment"
       type: string
+      pattern: '^.{1,30}$' # Ensures at least 1 character and up to 30 characters
       minLength: 1
-      maxLength: 30 
+      maxLength: 30
+      example: "abc123"
 
 ###################RESPONSES####################
 
   responses:
-
-    #403
+    # 403 Forbidden
     Forbidden:
       description: Forbidden. The user does not have the necessary permissions to perform this action.
       content:
         application/json:
           schema:
+            description: Error response indicating a Forbidden error.
             type: object
             properties:
               error:
                 type: string
                 example: "You do not have permission to access this resource."
-  
-    #400
+                description: Description of the Forbidden error message.
+
+    # 400 Bad Request
     BadRequest:
       description: Bad Request
       content:
         application/json:
           schema:
+            description: Error response indicating a Bad Request error.
             type: object
             properties:
               error:
                 type: string
                 example: "Invalid request parameters."
-    #401
+                description: Description of the Bad Request error message.
+
+    # 401 Unauthorized
     Unauthorized:
       description: Unauthorized
       content:
         application/json:
           schema:
+            description: Error response indicating an Unauthorized error.
             type: object
             properties:
               error:
                 type: string
                 example: "Missing or invalid authorization token."
-    #500
+                description: Description of the Unauthorized error message.
+
+    # 500 Internal Server Error
     InternalServerError:
       description: Internal Server Error
       content:
         application/json:
           schema:
+            description: Error response indicating an internal server error.
             type: object
             properties:
               error:
                 type: string
                 example: "An internal server error occurred."
+                description: Description of the Internal Server Error message.
+
 
   securitySchemes:
     bearerAuth:
