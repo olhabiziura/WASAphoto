@@ -200,7 +200,7 @@ export default {
 
         // on child event
         removePhotoFromList(pid) {
-            this.photosList = this.photosList.filter(photo => photo.pid != pid);
+            this.photosList = this.photosList.filter(photo => photo.PictureID != pid);
             this.photosCount -= 1;
         },
         visitUser(username) {

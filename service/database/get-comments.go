@@ -24,10 +24,12 @@ func (db *appdbimpl) GetComments(pictureID string) ([]models.Comment, error) {
 		if err != nil {
 			return nil, err
 		}
+		username, err := db.GetUsername(ownerID)
 		// Populate Comment struct
 		comment.OwnerID = ownerID
 		comment.Content = content
 		comment.CommentID = commentID
+		comment.Username = username
 		// Append to comments slice
 		comments = append(comments, comment)
 	}

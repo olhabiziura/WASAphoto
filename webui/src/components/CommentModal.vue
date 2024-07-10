@@ -85,7 +85,7 @@ export default {
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-10">
-                                    <h5>@<b>{{comment.ownerID}}</b></h5>
+                                    <h5>@<b>{{comment.Username}}</b></h5>
                                 </div>
                                 <div class="col-2">
                                     <button v-if="token == comment.user_id || isOwner" class="btn my-btn-comm" @click="uncommentPhoto(comment.CommentID)">
