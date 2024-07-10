@@ -46,11 +46,16 @@ func (rt *_router) AddComment(w http.ResponseWriter, r *http.Request, ps httprou
 		http.Error(w, "Failed to add a comment", http.StatusInternalServerError)
 		return
 	}
-
+	username, err := rt.db.GetUsername(userID)
+	if err != nil {
+		http.Error(w, "Failed to get username", http.StatusInternalServerError)
+		return
+	}
 	// Populate comment fields
 	comment.OwnerID = userID
 	comment.Content = content
 	comment.CommentID = commentID
+	comment.Username = username
 
 	// Respond with success message and the added comment
 	w.Header().Set("Content-Type", "application/json")

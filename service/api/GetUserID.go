@@ -11,7 +11,7 @@ import (
 )
 
 func (rt *_router) AddUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var UserID int64
+
 	var user models.User
 	// Decode JSON request body
 	decoder := json.NewDecoder(r.Body)

@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"wasaphoto/service/api/models"
 )
 
@@ -25,6 +24,10 @@ func (db *appdbimpl) GetComments(pictureID string) ([]models.Comment, error) {
 			return nil, err
 		}
 		username, err := db.GetUsername(ownerID)
+		if err != nil {
+
+			return nil, err
+		}
 		// Populate Comment struct
 		comment.OwnerID = ownerID
 		comment.Content = content

@@ -1,9 +1,5 @@
 package database
 
-import (
-	"fmt"
-)
-
 // AddUser inserts a new user into the database and returns the user_id.
 func (db *appdbimpl) AddUser(username string) (int64, error) {
 	// Execute the insert query with parameterized values to prevent SQL injection

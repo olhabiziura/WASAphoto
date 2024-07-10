@@ -324,7 +324,7 @@ paths:
                         $ref: "#/components/schemas/user_id"
                       content:
                         type: string
-                        minLength: 0
+                        minLength: 1
                         maxLength: 2200
                         example: "This is a comment."
                         description: Description of the response message indicating that comment was added.
