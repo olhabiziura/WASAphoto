@@ -65,27 +65,29 @@ paths:
             application/json:
               schema:
                 type: object
+                description: The response schema for a successful login
                 properties:
                   message:
                     type: string
+                    minLength: 3
+                    maxLength: 30
                     description: Success message
                   user_id:
                     $ref: '#/components/schemas/user_id'
                   username:
                     $ref: '#/components/schemas/username'
         '400':
-          description: Bad request. Invalid username or missing username in request body.
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized. Failed to authenticate user.
+          $ref: '#/components/responses/Unauthorized'
         '500':
-          description: Internal server error. Failed to process the login request.
+          $ref: '#/components/responses/InternalServerError'
 
 
 
   /username:
     put:
-      tags: 
-        - user
+      tags: [user]
       summary: Change User's username
       description: >
         Changes the existing username to a new one, provided that no other registered user already has this name.
@@ -96,6 +98,7 @@ paths:
           application/json:
             schema:
               type: object
+              description: The username to change to.
               properties:
                 username:
                   $ref: '#/components/schemas/username'
@@ -105,13 +108,23 @@ paths:
         '204':
           description: Username updated successfully
         '400':
-          description: Bad request. Invalid or missing username in request body.
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized. Missing authorization header.
+          $ref: '#/components/responses/Unauthorized'
         '409':
           description: Conflict. Username is already taken.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    minLength: 3
+                    maxLength: 30
+                    example: Username is already taken.
         '500':
-          description: Internal server error. Failed to process the username update request.
+          $ref: '#/components/responses/InternalServerError'
       security:
         - bearerAuth: []
 
@@ -128,19 +141,18 @@ paths:
         Adds a photo to the user's profile, placing it at the top of the user's feed.
         This operation accepts both an image file and an accompanying text.
       requestBody:
-
         content:
           multipart/form-data:
             schema:
               type: object
+              description: The picture to post and its description.
               properties:
                 picture:
-                  type: string
-                  format: binary
+                  $ref: '#/components/schemas/binary_image'
                 description:
                   type: string
                   description: Description of the photo
-                  minLength: 1   
+                  minLength: 1
                   maxLength: 2200
       responses:
         '200':
@@ -150,20 +162,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/picture'
         '400':
-          description: Bad request. Missing required parameters or failed to parse multipart form.
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized. Missing authorization header.
+          $ref: '#/components/responses/Unauthorized'
         '500':
-          description: Internal server error. Failed to upload or add photo.
-
-
+          $ref: '#/components/responses/InternalServerError'
 
 
     get:
       operationId: getUserFeed
-      tags:
-        - photos
+      tags: [photos]
       summary: Gets a list of photos from user's feed
+      description: Retrieves the photos posted in the user's feed.
       responses:
         '200':
           description: Photo feed retrieved successfully
@@ -180,11 +190,11 @@ paths:
                     items:
                       $ref: '#/components/schemas/picture'
         '400':
-          description: Bad request. Missing authorization header.
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized. Missing or invalid authorization token.
+          $ref: '#/components/responses/Unauthorized'
         '500':
-          description: Internal server error. Failed to retrieve photo feed.
+          $ref: '#/components/responses/InternalServerError'
       security:
         - bearerAuth: []
 
@@ -196,13 +206,13 @@ paths:
   /deletephoto/{picture_id}:
     delete:
       operationId: deletePhoto
-      tags:
-        - photos
+      tags: [photos]
       summary: Deletes a photo
       description: Deleting a photo by its ID.
       parameters:
         - in: path
           name: picture_id
+          description: Id of picture to delete.
           required: true
           schema:
             $ref: '#/components/schemas/picture_id'
@@ -210,7 +220,7 @@ paths:
         '204':
           description: The photo has been deleted successfully
         '400':
-          description: The request was not valid. Can be invalid user_id or picture_id.
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -222,10 +232,11 @@ paths:
     parameters:
       - in: path
         name: picture_id
+        description: Picture id.
         required: true
         schema:
           $ref: '#/components/schemas/picture_id'
-
+  
     post:
       tags: [likes]
       summary: Like or Unlike a Picture
@@ -235,13 +246,12 @@ paths:
         '204':
           description: Like added or removed successfully
         '400':
-          description: Bad request. Missing required parameters or invalid input.
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized. Missing authorization header or invalid credentials.
+          $ref: '#/components/responses/Unauthorized'
         '500':
-          description: Internal server error. Failed to process the like operation.
-
-
+          $ref: '#/components/responses/InternalServerError'
+  
     delete:
       tags: [likes]
       operationId: unlikePhoto
@@ -252,11 +262,9 @@ paths:
         "204":
           description: Your like was deleted.
         "400":
-          description: Bad Request. No previous like on this picture or the action is not valid.
-          content:
-            application/json: {} 
+          $ref: '#/components/responses/BadRequest'
         '500':
-            $ref: '#/components/responses/InternalServerError'
+          $ref: '#/components/responses/InternalServerError'
           
 
 
@@ -265,9 +273,11 @@ paths:
       tags: [comments]
       operationId: commentPhoto
       summary: Add a comment to a picture
+
       parameters:
         - in: path
           name: picture_id
+          description: Picture ID.
           required: true
           schema:
             $ref: '#/components/schemas/picture_id'
@@ -277,6 +287,7 @@ paths:
           application/json:
             schema:
               type: object
+              description: Content od the comment to post
               properties:
                 text:
                   type: string
@@ -293,6 +304,8 @@ paths:
                 properties:
                   message:
                     type: string
+                    minLength: 3
+                    maxLength: 30
                     example: Comment added successfully
                   comment:
                     type: object
@@ -305,11 +318,11 @@ paths:
                         maxLength: 2200
                         example: "This is a comment."
         '400':
-          description: Bad request. Missing required parameters or empty comment text.
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized. Missing authorization header.
+          $ref: '#/components/responses/Unauthorized'
         '500':
-          description: Internal server error. Failed to add a comment.
+          $ref: '#/components/responses/InternalServerError'
           
 
   /deletecomment/{picture_id}/comment/{comment_id}:
@@ -337,10 +350,9 @@ paths:
       responses:
         "200":
           description: Comment was deleted successfully.
+          content: {} 
         "400":
-          description: Bad Request. The comment does not belong to the user or is not valid.
-          content:
-            application/json: {} 
+          $ref: '#/components/responses/BadRequest' 
         '500':
             $ref: '#/components/responses/InternalServerError'
           
@@ -361,14 +373,20 @@ paths:
       responses:
         "204":
           description: User subscribed successfully.
-        "201":
-          description: User is already being followed.
+        '201':
+          description: User is already being followeds.
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 3
+                    maxLength: 30
+                    example: User is already being followed.
         "400":
-          description: Bad Request. The request is malformed, or the target user does not exist.
-          content:
-            application/json: {}
+          $ref: '#/components/responses/BadRequest'
         "500":
           $ref: '#/components/responses/InternalServerError'
           
@@ -387,14 +405,20 @@ paths:
       responses:
         "204":
           description: User unsubscribed successfully.
-        "201":
-          description: User wasn't following the provided user.
+        '201':
+          description: User was not following a provided account.
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 3
+                    maxLength: 30
+                    example: User was not following provided account..
         "400":
-          description: Bad Request. The request is malformed or the user to be unfollowed does not exist.
-          content:
-            application/json: {}
+          $ref: '#/components/responses/BadRequest'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -417,14 +441,20 @@ paths:
       responses:
         "204":
           description: User banned successfully.
-        "201":
+        '201':
           description: User is already banned.
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 3
+                    maxLength: 30
+                    example: User is already banned.
         "400":
-          description: Bad Request. No user provided or the request is malformed.
-          content:
-            application/json: {}
+          $ref: '#/components/responses/BadRequest'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -436,14 +466,20 @@ paths:
       responses:
         "204":
           description: User unbanned successfully.
-        "201":
-          description: User was not banned.
+        '201':
+          description: User wasn't banned.
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 3
+                    maxLength: 30
+                    example: User wasn't banned.
         "400":
-          description: Bad Request. The request is malformed.
-          content:
-            application/json: {}
+          $ref: '#/components/responses/BadRequest'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -466,25 +502,9 @@ paths:
                     type: boolean
                     description: Indicates if the user is banned by the specified user.
         '400':
-          description: Bad Request - Missing or invalid Authorization header or userID parameter.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Error message detailing what went wrong.
+          $ref: '#/components/responses/BadRequest'
         '500':
-          description: Internal Server Error - An error occurred while checking the ban status.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    description: Error message detailing what went wrong.
+          $ref: '#/components/responses/InternalServerError'
       security:
         - bearerAuth: []
 
@@ -512,13 +532,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/profile'
         '400':
-          description: Bad request. Missing required parameters.
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized. Missing authorization header.
+          $ref: '#/components/responses/Unauthorized'
         '404':
           description: User profile not found.
+          content: {} 
         '500':
-          description: Internal server error. Failed to retrieve profile information.
+          $ref: '#/components/responses/InternalServerError'
 
 
   /stream:
@@ -539,17 +560,18 @@ paths:
                 type: object
                 properties:
                   pictures:
+                    description: a list of pictures.
                     type: array
                     minItems: 0
                     maxItems: 300
                     items:
                       $ref: '#/components/schemas/picture'
         '400':
-          description: Bad request. Missing authorization header.
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized. Missing or invalid authorization token.
+          $ref: '#/components/responses/Unauthorized'
         '500':
-          description: Internal server error. Failed to retrieve user stream.
+          $ref: '#/components/responses/InternalServerError'
       security:
         - bearerAuth: []
   
@@ -573,12 +595,14 @@ paths:
               schema:
                 type: object
                 properties:
-                  users:
+                  users:       
                     type: array
+                    description: an array of users.
                     minItems: 0
                     maxItems: 300
                     items:
                       type: object
+                      description: user data.
                       properties:
                         userID:
                           $ref: "#/components/schemas/user_id"
@@ -586,9 +610,9 @@ paths:
                            $ref: "#/components/schemas/username"
 
         '400':
-          description: Invalid request parameters
+          $ref: '#/components/responses/BadRequest'
         '500':
-          description: Internal server error
+          $ref: '#/components/responses/InternalServerError'
       security:
         - bearerAuth: []
 
@@ -687,7 +711,7 @@ components:
           maxLength: 60
           format: date-time
           description: Date and time of uploading the picture
-          example: '12/04/2023-13:06'
+          example: '12023-12-04T13:06:00Z' 
         likes:
           type: array
           minItems: 0
@@ -699,6 +723,7 @@ components:
           type: array
           minItems: 0
           maxItems: 300
+          description: List of comments.
           items: 
             $ref: '#/components/schemas/comment'
         image:
@@ -744,17 +769,52 @@ components:
 ###################RESPONSES####################
 
   responses:
-      #401
-    Unauthorized:
-      description: The request was not authorized. The user must log in.
-  
-      #403
+
+    #403
     Forbidden:
-      description: The request was not authorized. The user does not have the necessary permissions.
+      description: Forbidden. The user does not have the necessary permissions to perform this action.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "You do not have permission to access this resource."
   
-      #500
+    #400
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Invalid request parameters."
+    #401
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Missing or invalid authorization token."
+    #500
     InternalServerError:
-      description: An error occurred on the server. Please try again later.
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "An internal server error occurred."
 
   securitySchemes:
     bearerAuth:
