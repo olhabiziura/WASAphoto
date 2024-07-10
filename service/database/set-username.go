@@ -2,8 +2,8 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"errors"
+	"fmt"
 )
 
 // SetUsername updates the username of a user identified by userID to a new username.

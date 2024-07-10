@@ -2,8 +2,8 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"errors"
+	"fmt"
 )
 
 // DeletePhoto deletes a photo record from the database and returns the file path of the deleted photo.

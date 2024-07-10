@@ -2,8 +2,8 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"errors"
+	"fmt"
 )
 
 func (db *appdbimpl) Login(username string) (int64, error) {
