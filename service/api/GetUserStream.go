@@ -55,6 +55,6 @@ func (rt *_router) GetUserStream(w http.ResponseWriter, r *http.Request, ps http
 	err = json.NewEncoder(w).Encode(userStream)
 	if err != nil {
 		http.Error(w, "Failed to encode response to JSON", http.StatusInternalServerError)
-		log.Printf("Failed to encode response: %w", err)
+		log.Printf("Failed to encode response: %v", err)
 	}
 }

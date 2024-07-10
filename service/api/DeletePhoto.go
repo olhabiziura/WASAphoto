@@ -29,7 +29,7 @@ func (rt *_router) DeletePhotoHandler(w http.ResponseWriter, r *http.Request, ps
 		if err.Error() == "photo not found" {
 			http.Error(w, "Photo not found", http.StatusBadRequest)
 		} else {
-			http.Error(w, fmt.Sprintf("Failed to delete photo: %w", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Failed to delete photo: %v", err), http.StatusInternalServerError)
 		}
 		return
 	}
@@ -37,7 +37,7 @@ func (rt *_router) DeletePhotoHandler(w http.ResponseWriter, r *http.Request, ps
 	// Delete the file from disk
 	err = os.Remove(filePath)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to delete file: %w", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Failed to delete file: %v", err), http.StatusInternalServerError)
 		return
 	}
 
