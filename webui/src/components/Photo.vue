@@ -11,7 +11,7 @@ export default {
 		}
 	},
 
-	props: ['key', 'pid', 'user_id', 'username', 'date', 'likesListParent', 'commentsListParent', 'isOwner', 'image'], 
+	props: [ 'pid', 'user_id', 'username', 'date', 'likesListParent', 'commentsListParent', 'isOwner', 'image'], 
     
 	methods: {
 		async deletePhoto() {
