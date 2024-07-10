@@ -17,7 +17,7 @@ func (rt *_router) Login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	// Decode JSON request body
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&user); err != nil {
-		http.Error(w, fmt.Sprintf("Failed to parse request body: %w", err), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Failed to parse request body: %v", err), http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
@@ -31,7 +31,7 @@ func (rt *_router) Login(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	// Call the database function to perform login
 	userID, err := rt.db.Login(user.Username)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to login user: %w", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Failed to login user: %v", err), http.StatusInternalServerError)
 		return
 	}
 
