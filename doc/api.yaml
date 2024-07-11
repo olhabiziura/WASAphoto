@@ -207,7 +207,7 @@ paths:
     
 
 
-  /deletephoto/{picture_id}:
+  /photo/{picture_id}:
     delete:
       operationId: deletePhoto
       tags: [photos]
@@ -272,7 +272,7 @@ paths:
           
 
 
-  /addcomment/{picture_id}:
+  /comment/{picture_id}:
     post:
       tags: [comments]
       operationId: commentPhoto
@@ -336,7 +336,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
           
 
-  /deletecomment/{picture_id}/comment/{comment_id}:
+  /comment/{picture_id}/comment/{comment_id}:
     parameters:
       - in: path
         name: picture_id

@@ -15,7 +15,7 @@ export default {
 		async commentPhoto() {
             try {
                 // POST /photo/{pid}/comment
-                let response = await this.$axios.post(`/addcomment/${this.pid}`, { text: this.text }, {
+                let response = await this.$axios.post(`/comment/${this.pid}`, { text: this.text }, {
                     headers: {
                         'Authorization': sessionStorage.getItem('token'),
                         'Content-Type': 'application/json'
@@ -36,7 +36,7 @@ export default {
         async uncommentPhoto(comment_id) {
             try {
                 // DELETE /photo/{pid}/comment/{comment_id}
-                await this.$axios.delete(`/deletecomment/${this.pid}/comment/${comment_id}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
+                await this.$axios.delete(`/comment/${this.pid}/comment/${comment_id}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
                 this.$emit('removeComment', comment_id); // signal to parent
             } catch(error) {
                 const status = error.response.status;

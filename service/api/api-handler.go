@@ -13,10 +13,10 @@ func (rt *_router) Handler() http.Handler {
 
 	rt.router.POST("/photo", rt.AddPhotoHandler)
 	rt.router.GET("/photo", rt.GetUserFeed)
-	rt.router.DELETE("/deletephoto/:pictureID", rt.DeletePhotoHandler)
+	rt.router.DELETE("/photo/:pictureID", rt.DeletePhotoHandler)
 
-	rt.router.POST("/addcomment/:pictureID", rt.AddComment)
-	rt.router.DELETE("/deletecomment/:pictureID/comment/:commentID", rt.DeleteComment)
+	rt.router.POST("/comment/:pictureID", rt.AddComment)
+	rt.router.DELETE("/comment/:pictureID/comment/:commentID", rt.DeleteComment)
 
 	rt.router.POST("/like/:pictureID", rt.AddLike)
 	rt.router.DELETE("/like/:pictureID", rt.DeleteLike)

@@ -17,7 +17,7 @@ export default {
 		async deletePhoto() {
 			try {
 				// DELETE /photo/{id}
-				await this.$axios.delete(`/deletephoto/${this.pid}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
+				await this.$axios.delete(`/photo/${this.pid}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
 				this.$emit("removePhoto", this.pid);
 			} catch (error) {
                 const status = error.response.status;
