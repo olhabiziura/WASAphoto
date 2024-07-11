@@ -80,10 +80,6 @@ export default {
                 console.log("after")
                 console.log(response)
                 
-
-
-                
-            
         
 
                 // Sort photos by date in descending order
