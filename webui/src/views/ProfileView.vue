@@ -139,7 +139,7 @@ export default {
             try {
                 if (this.doIFollowUser) { 
                      // DELETE /unfollow/{uid}
-                    await this.$axios.delete(`/unfollow/${this.user_id}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
+                    await this.$axios.delete(`/follow/${this.user_id}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
                     this.getUserProfile();
                 } else {
                     // POST /follow/{uid}
@@ -163,6 +163,7 @@ export default {
                 } else {
                     // POST /ban/{uid}
                     await this.$axios.post(`/ban/${this.user_id}`, null, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
+                    this.isInMyBannedList = true;
                     this.getUserProfile();
                 }
             } catch (error) {
