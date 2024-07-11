@@ -66,6 +66,8 @@ export default {
 		addCommentToList(comment){
 			this.comments.unshift(comment); // at the beginning of the list
 		},
+        
+        
         visitLiker(username) {
             if (username != this.$route.params.username) {
                 document.querySelector('.modal-backdrop').remove();
@@ -97,11 +99,7 @@ export default {
 <template>
 	<div class="container-fluid mt-3 mb-5 ">
 
-        <UserModal
-        :modalID="'likesModal'+pid" 
-		:usersList="likes"
-        @visitUser="visitLiker"
-        />
+
 
         <CommentModal
         :modalID="'commentModal'+pid" 
