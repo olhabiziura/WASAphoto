@@ -69,7 +69,7 @@ export default {
                 this.banList = profile.banList || []
                 this.amIBanned = this.banList.some(user =>user === sessionStorage.getItem('token'));
                 if (this.amIBanned){
-                    await this.$axios.delete(`/unfollow/${this.user_id}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
+                    await this.$axios.delete(`/follow/${this.user_id}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
                     this.getUserProfile();
                 }
 
