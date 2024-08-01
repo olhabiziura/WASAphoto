@@ -4,11 +4,12 @@ export default {
 		return{
             token: sessionStorage.getItem('token'),
 			text:"",
+            isOwner: false,
 
 		}
 	},
 
-	props:['modalID','comments','isOwner','pid'],
+	props:['modalID','comments','pid', 'isOwner'],
 
 	methods: {
 
@@ -88,7 +89,7 @@ export default {
                                     <h5>@<b>{{comment.Username}}</b></h5>
                                 </div>
                                 <div class="col-2">
-                                    <button v-if="token == comment.user_id || isOwner" class="btn my-btn-comm" @click="uncommentPhoto(comment.CommentID)">
+                                    <button v-if="token == comment.ownerID || isOwner" class="btn my-btn-comm" @click="uncommentPhoto(comment.CommentID)">
                                         <i class="fa-regular fa-trash-can my-trash-icon"></i>
                                     </button>
                                 </div>

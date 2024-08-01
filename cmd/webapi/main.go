@@ -28,9 +28,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"wasaphoto/service/api"
-	"wasaphoto/service/database"
-	"wasaphoto/service/globaltime"
 	"github.com/ardanlabs/conf"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/sirupsen/logrus"
@@ -39,6 +36,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"wasaphoto/service/api"
+	"wasaphoto/service/database"
+	"wasaphoto/service/globaltime"
 )
 
 // main is the program entry point. The only purpose of this function is to call run() and set the exit code if there is
@@ -121,13 +121,12 @@ func run() error {
 	}
 	router := apirouter.Handler()
 
-	
 	router, err = registerWebUI(router)
 	if err != nil {
 		logger.WithError(err).Error("error registering web UI handler")
 		return fmt.Errorf("registering web UI handler: %w", err)
 	}
-   
+
 	// Apply CORS policy
 	router = applyCORSHandler(router)
 

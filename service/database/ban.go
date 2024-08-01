@@ -26,6 +26,14 @@ func (db *appdbimpl) AddBan(UserID, BanID string) error {
 		return err
 	}
 
+	err = db.DeleteFollower(UserID, BanID)
+	if errors.Is(err, ErrNotFollowing) {
+		// If the user was not following, we can ignore this error
+		return nil
+	} else if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -36,6 +44,6 @@ func (db *appdbimpl) DeleteBan(UserID, BannedID string) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
+
 }

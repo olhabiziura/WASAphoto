@@ -28,7 +28,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/ban/:userID", rt.DeleteBan)
 	rt.router.GET("/ban/:userID", rt.GetIfBanned)
 
-	//rt.router.POST("/getid", rt.GetUserId)
+	// rt.router.POST("/getid", rt.GetUserId)
 	rt.router.POST("/session", rt.Login)
 	rt.router.PUT("/username", rt.SetUsernameHandler)
 	rt.router.GET("/profile/:userID", rt.GetProfile)

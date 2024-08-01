@@ -17,7 +17,11 @@ func ReadImageAsBase64(filePath string) (string, error) {
 
 		return "", err
 	}
-	return base64.StdEncoding.EncodeToString(imageData), nil
+	image := base64.StdEncoding.EncodeToString(imageData)
+	if err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
+	return image, nil
 }
 
 func (rt *_router) GetUserFeed(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

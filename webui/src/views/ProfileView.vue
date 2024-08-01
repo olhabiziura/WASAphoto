@@ -50,6 +50,9 @@ export default {
                 return
             }
             try {
+
+                this.isOwner = false
+            
                 let username = this.$route.params.username;
                 let response = await this.$axios({
                     method: 'post',
@@ -62,6 +65,10 @@ export default {
                     }
                 });
                 this.user_id = response.data.user_id;
+                if (this.user_id == sessionStorage.getItem('token')){
+                    this.isOwner = true
+                }
+   
                 console.log(sessionStorage.getItem('token'))
                 response = await this.$axios.get(`/profile/${this.user_id}`, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
                 let profile = response.data;
@@ -89,10 +96,13 @@ export default {
                 this.doIFollowUser = this.followerList.some(user => user.UserID === sessionStorage.getItem('token'));
 
                 this.followingList = profile.followingList || []
+
+
                 if (sessionStorage.getItem('username') === username.toLowerCase()) {
                     this.isOwner = true;
                 }
                 
+
                 if (profile.photoList != null) {
                     this.photosCount = profile.photoList.length;
                 } else {
@@ -159,6 +169,7 @@ export default {
                 } else {
                     // POST /ban/{uid}
                     await this.$axios.post(`/ban/${this.user_id}`, null, {headers: {'Authorization': `${sessionStorage.getItem('token')}`}});
+
                     this.isInMyBannedList = true;
                     this.getUserProfile();
                 }
