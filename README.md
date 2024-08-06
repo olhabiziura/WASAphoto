@@ -1,4 +1,4 @@
-## WASAPhoto - a full stuck web-app developed for the course Web & Software Architecture in Sapienza University.
+## WASAPhoto - a full stack web-app developed for the course Web & Software Architecture in Sapienza University.
 
 This repository contains the basic structure for [Web and Software Architecture](http://gamificationlab.uniroma1.it/en/wasa/) project.
 
