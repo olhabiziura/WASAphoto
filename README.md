@@ -1,10 +1,73 @@
-# Fantastic coffee (decaffeinated)
+## WASAPhoto - a full stuck web-app developed for the course Web & Software Architecture in Sapienza University.
 
-This repository contains the basic structure for [Web and Software Architecture](http://gamificationlab.uniroma1.it/en/wasa/) homework project.
-It has been described in class.
+This repository contains the basic structure for [Web and Software Architecture](http://gamificationlab.uniroma1.it/en/wasa/) project.
 
-"Fantastic coffee (decaffeinated)" is a simplified version for the WASA course, not suitable for a production environment.
-The full version can be found in the "Fantastic Coffee" repository.
+# Project Description
+
+ 
+
+Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto! You can
+upload your photos directly from your PC, and they will be visible to everyone following you.
+
+## Project specification - Simplified login
+
+In real-world scenarios, new developments avoid implementing registration, login, and password-lost
+flows as they are a security nightmare, cumbersome, error-prone, and outside the project scope. So,
+why lose money and time on implementing those? The best practice is now to delegate those tasks to
+a separate service (“identity provider”), either in-house (owned by the same company) or a third party
+(like “Login with Apple/Facebook/Google” buttons).
+
+In this project, we do not have an external service like this. Instead, we decided to provide you with a
+specification for a login API so that you won’t spend time dealing with the design of the endpoint. 
+
+The login endpoint accepts a username – like “Maria” – without any password. If the username already
+exists, the user is logged in. If the username is new, the user is registered and logged in. The API will
+return the user identifier you need to pass into the Authorization header in any other API.
+
+![image](https://github.com/user-attachments/assets/13f61198-80a6-45fb-9938-b521916b0393)
+
+
+![image](https://github.com/user-attachments/assets/fba9801b-d0de-4773-b5d1-7d4035bec035)
+
+## Project functionality 
+
+Each user is presented with a stream of photos (images) in reverse chronological order, with
+information about when each photo was uploaded (date and time) and how many likes and comments
+it has. The stream is composed by photos from “following” (other users that the user follows). Users
+can place (and later remove) a “like” to photos from other users. Also, users can add comments to any
+image (even those uploaded by themself). Only authors can remove their comments.
+
+![image](https://github.com/user-attachments/assets/619f458b-dbe7-453e-8b3c-91e4b4c3e94f)
+
+![image](https://github.com/user-attachments/assets/98a7d256-251e-4844-bdc5-a8e459dceef1)
+
+
+Users can ban other users. If user Alice bans user Eve, Eve won’t be able to see any information about
+Alice. Alice can decide to remove the ban at any moment.
+
+
+![image](https://github.com/user-attachments/assets/2b91074a-ae77-4021-8195-f420c7e9d1fe)
+
+
+![image](https://github.com/user-attachments/assets/05f118f0-fa34-4dff-bccb-c5c5edbfda37)
+
+
+
+
+Users have their profiles. The personal profile page for the user shows: the user’s photos (in reverse
+chronological order), how many photos have been uploaded, and the user’s followers and following.
+
+![image](https://github.com/user-attachments/assets/4d8dbeb3-8907-4893-9c3c-7f2094874076)
+
+
+
+Users can change their usernames, upload photos, remove photos, and follow/unfollow other users.
+Removal of an image will also remove likes and comments.
+
+A user can search other user profiles via username.
+
+![image](https://github.com/user-attachments/assets/d5b66c7b-0b9d-42e5-a6dd-e5bf0c51ab36)
+
 
 ## Project structure
 
@@ -30,10 +93,6 @@ Other project files include:
 
 This project uses [Go Vendoring](https://go.dev/ref/mod#vendoring). You must use `go mod vendor` after changing some dependency (`go get` or `go mod tidy`) and add all files under `vendor/` directory in your commit.
 
-For more information about vendoring:
-
-* https://go.dev/ref/mod#vendoring
-* https://www.ardanlabs.com/blog/2020/04/modules-06-vendoring.html
 
 ## Node/NPM vendoring
 
@@ -44,12 +103,8 @@ This repository contains the `webui/node_modules` directory with all dependencie
 You need to:
 
 * Change the Go module path to your module path in `go.mod`, `go.sum`, and in `*.go` files around the project
-* Rewrite the API documentation `doc/api.yaml`
-* If no web frontend is expected, remove `webui` and `cmd/webapi/register-webui.go`
 * If no cronjobs or health checks are needed, remove them from `cmd/`
 * Update top/package comment inside `cmd/webapi/main.go` to reflect the actual project usage, goal, and general info
-* Update the code in `run()` function (`cmd/webapi/main.go`) to connect to databases or external resources
-* Write API code inside `service/api`, and create any further package inside `service/` (or subdirectories)
 
 ## How to build
 
@@ -86,45 +141,3 @@ If you want to launch the WebUI, open a new tab and launch:
 npm run dev
 ```
 
-## How to build for production / homework delivery
-
-```shell
-./open-npm.sh
-# (here you're inside the NPM container)
-npm run build-prod
-```
-
-For "Web and Software Architecture" students: before committing and pushing your work for grading, please read the section below named "My build works when I use `npm run dev`, however there is a Javascript crash in production/grading"
-
-## Known issues
-
-### Apple M1 / ARM: `failed to load config from`...
-
-If you use Apple M1/M2 hardware, or other ARM CPUs, you may encounter an error message saying that `esbuild` (or some other tool) has been built for another platform.
-
-If so, you can fix issuing these commands **only the first time**:
-
-```shell
-./open-npm.sh
-# (here you're inside the NPM container)
-npm install
-exit
-# Now you can continue as indicated in "How to build/run"
-```
-
-**Use these instructions only if you get an error. Do not use it if your build is OK**.
-
-### My build works when I use `npm run dev`, however there is a Javascript crash in production/grading
-
-Some errors in the code are somehow not shown in `vite` development mode. To preview the code that will be used in production/grading settings, use the following commands:
-
-```shell
-./open-npm.sh
-# (here you're inside the NPM container)
-npm run build-prod
-npm run preview
-```
-
-## License
-
-See [LICENSE](LICENSE).
